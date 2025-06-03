@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>卡組列表</title>
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      gap: 10px;
+    }
+
+    .search-input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 300px;
+    }
+
+    .search-button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .search-button:hover {
+      background: #0056b3;
+    }
+
+    .deck-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 0;
+      justify-content: center;
+      list-style-type: none;
+    }
+
+    .deck-item {
+      flex: 0 1 calc(16% - 15px);
+      background: #2b2b2b;
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-size: 14px;
+    }
+
+    .deck-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .deck-item img {
+      width: 90%;
+      height: 200px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      margin-top: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .deck-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .deck-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      margin: 10px 0;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+      font-family: 'Orbitron', 'Exo 2', Arial, sans-serif;
+    }
+
+    .top-right-image {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .top-right-image img {
+      max-width: 200px;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    .navigation-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .nav-button {
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .nav-button:hover {
+      background: linear-gradient(45deg, #0056b3, #003f7f);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .nav-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <h1 style="position: relative;">卡組列表</h1>
+
+  <!-- 返回按鈕 -->
+  <div class="navigation-buttons">
+    <button class="nav-button" id="go-back-btn">返回</button>
+    <button class="nav-button" id="go-to-series-btn">返回系列</button>
+  </div>
+
+  <!-- 右上角圖片 -->
+  <div class="top-right-image">
+    <img src="/images/union.png" alt="Union Image">
+  </div>
+
+  <!-- 搜索功能 -->
+  <div class="search-container">
+    <input type="text" id="deckNameInput" class="search-input" placeholder="輸入牌組名稱">
+    <button class="search-button" id="search-deck-btn">查看牌組</button>
+    
+    <select id="seriesSelect" class="search-input">
+      <option value="" disabled selected>選擇系列</option>
+      <option value="all">全部</option>
+      <% seriesList.forEach(series => { %>
+        <option value="<%= series %>"><%= series %></option>
+      <% }) %>
+    </select>
+    <button class="search-button" id="search-series-btn">搜索系列</button>
+  </div>
+  <!-- 牌組列表 -->
+  <ul class="deck-list" id="deckList">
+    <% decks.forEach(deck => { %>
+      <li class="deck-item">
+        <a href="/decks/<%= deck.deckName %>">
+          <img src="<%= deck.coverImage %>" alt="<%= deck.deckName %>">
+        </a>
+        <div class="deck-name"><%= deck.deckName %></div>
+        <p>留言數量：<%= deck.commentCount %></p>
+        <% if (deck.latestCommentTime) { %>
+          <p>最新留言時間：<%= new Date(deck.latestCommentTime).toLocaleString() %></p>
+        <% } %>
+      </li>
+    <% }) %>
+  </ul>
+  <script src="/scripts/decks.js"></script>
+</body>
+</html>

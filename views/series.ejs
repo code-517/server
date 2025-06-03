@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系列選擇</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+    .container {
+      display: flex; /* 使用 Flexbox 排列 */
+      align-items: center; /* 垂直置中 */
+      justify-content: space-between; 
+      gap: 10px; /* 元素之間的間距 */
+      padding: 20px; /* 整體內邊距 */
+    }
+    .top-left-image img{
+      max-width: 300px;
+      height: auto;
+      border-radius: 10px;
+      margin: 0; /* 確保沒有外邊距 */
+      padding: 0; /* 確保沒有內邊距 */
+    }
+    .top-right-image img {
+      max-width: 150px;
+      height: auto;
+      border-radius: 10px;
+    }
+    .notice-board {
+      width: 80%; /* 寬度為頁面寬度的 80% */
+      max-width: 400px; /* 最大寬度 */
+      background-color: #444; /* 背景顏色 */
+      color: #fff; /* 字體顏色 */
+      border-radius: 8px; /* 圓角 */
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 陰影效果 */
+      padding: 15px; /* 內邊距 */
+      font-size: 14px; /* 字體大小 */
+      line-height: 1.5; /* 行高 */
+      text-align: center; /* 文字置中 */
+    }
+    .notice-board h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .series-select-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .series-select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .series-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .series-card {
+      background: #333;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      width: 300px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .series-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    }
+    .series-card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .series-card h2 {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    .view-decks-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .view-decks-button:hover {
+      background-color: #0056b3;
+    }
+    .logo-container {
+      display: flex; /* 圖片水平排列 */
+      align-items: center; /* 垂直置中 */
+      gap: 10px; /* 圖片之間的間距 */
+    }
+    
+    .server-name img {
+      max-width: 150px; /* 根據需要調整圖片大小 */
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- 查看牌組按鈕 -->
+  <button class="view-decks-button" id="view-decks-btn">查看牌組</button>
+
+  <!-- 水平排列的容器 -->
+  <div class="container">
+    <div class="logo-container">
+      <div class="server-name">
+        <img src="/images/name.png" alt="歪西工坊">
+      </div>
+    </div>
+    <!-- 下拉式選單 -->
+    <div class="series-select-container">
+      <h1>選擇系列</h1>
+      <select class="series-select" id="series-select">
+        <option value="" disabled selected>選擇系列</option>
+        <% seriesData.forEach(series => { %>
+          <option value="<%= series.name %>"><%= series.name %></option>
+        <% }) %>
+      </select>
+    </div>
+  
+    <!-- 布告欄 -->
+    <div class="notice-board">
+      <h3>📜📜佈告欄📜📜</h3>
+      <p>歡迎使用本系統！有任何問題可以聯絡以下email</p>
+      <p>聯絡信箱: neko5102@gmail.com</p>
+      <p>注意：牌組將在一個月內無人瀏覽時自動刪除。</p>
+      <p>
+        點擊 <a href="https://torecards.com/unionarenatier/" target="_blank" style="color: rgb(30, 255, 0); text-decoration: underline;">T 表</a> 可前往別人的網站查看T表。
+      </p>
+    </div>
+    <!-- 右上角圖片 -->
+    <div class="top-right-image">
+      <img src="/images/union.png" alt="Union">
+    </div>
+  </div>
+  <!-- 系列卡片 -->
+  <div class="series-container">
+    <% seriesData.forEach(series => { %>
+      <div class="series-card" data-series-name="<%= series.name %>">
+        <img src="<%= series.image %>" alt="<%= series.name %>">
+        <h2><%= series.name %></h2>
+      </div>
+    <% }) %>
+  </div>
+</body>
+  <!-- 外部腳本 -->
+  <script src="/scripts/series.js"></script>
+</html>

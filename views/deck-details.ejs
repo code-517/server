@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <title><%= deckName %> - 卡組詳細內容</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .header-container h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    .header-container .total-price {
+      font-size: 24px;
+      margin: 0;
+      color: #fff;
+    }
+    .deck-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .deck-card {
+      position: relative;
+      width: 300px;
+      height: 400px;
+      background-color: #333;
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    .deck-card img {
+      width: 100%;
+      height: 100%;
+    }
+    .deck-card .card-count {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 28px; /* 調整字體大小 */
+      font-weight: bold;
+      padding: 12px 20px; /* 調整內邊距 */
+      border-radius: 15px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .modal-content {
+      display: flex;
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 0;
+      width: 95%;
+      max-width: 1000px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      gap: 0;
+      position: relative;
+    }
+    .modal-left {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #333;
+    }
+    .modal-left img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .modal-right {
+      flex: 2;
+      padding: 20px;
+      color: #fff;
+    }
+    .modal-right h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+    .modal-right p {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .modal-right hr {
+      border: 0;
+      border-top: 1px solid #333;
+      margin: 15px 0;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ff5c5c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    .close-btn:hover {
+      background: #ff3b3b;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .back-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff5c5c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-button:hover {
+      background-color: #ff3b3b;
+    }
+  </style>
+</head>
+<body 
+  data-deck='<%= JSON.stringify(deck) %>' 
+  data-deck-name="<%= deckName %>" 
+  data-deck-idea="<%= deckIdea || '' %>" 
+  data-total-price="<%= totalPrice %>">
+  <!-- 左上角顯示卡組第一張圖片，右上角顯示思路分享 -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+    <!-- 左上角卡組第一張圖片 -->
+    <div style="flex: 1; max-width: 300px;">
+      <img src="<%= deck[0]?.image_url || '/path/to/default-image.png' %>" alt="卡組第一張" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+    </div>
+    <!-- 右上角思路分享框 -->
+    <div style="flex: 2; margin-left: 20px;">
+      <h3 style="margin-bottom: 10px;">思路分享</h3>
+      <textarea id="deck-idea" placeholder="輸入思路分享 (可為空)" style="width: 100%; height: 100px; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; resize: none;" readonly></textarea>
+      
+      <!-- 留言區 -->
+      <div class="comments-section" style="margin-top: 20px;">
+        <h3><span style="margin-right:5px;">💬</span>留言區</h3>
+        <p id="comment-count">留言數量：<%= comments.length %></p>
+        <ul id="comments-list">
+          <% comments.forEach(comment => { %>
+            <li>
+              <strong>匿名用戶：</strong> <%= comment.comment %> <em>(<%= new Date(comment.timestamp).toLocaleString() %>)</em>
+            </li>
+          <% }) %>
+        </ul>
+        <form id="comment-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <textarea id="commentInput" placeholder="輸入你的留言" style="width: 100%; height: 60px; padding: 10px; font-size: 14px; border-radius: 5px; border: 1px solid #ccc; margin-top: 10px;"></textarea>
+          <button type="submit" style="margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">發表留言</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- 原本的卡組內容 -->
+  <div class="header-container">
+    <h1><%= deckName %> - 卡組詳細內容</h1>
+    <p class="total-price">總金額: <%= Math.round(totalPrice) %> 日元</p>
+  </div>
+  <div class="deck-container"></div>
+  <button class="back-button" id="go-back-btn">返回</button>
+  <button id="export-deck-btn">輸出牌組圖片</button>
+  <div id="card-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" id="close-modal-btn">×</button>
+      <div class="modal-left">
+        <img id="modal-image" src="" alt="卡片圖片">
+      </div>
+      <div class="modal-right">
+        <h3 id="modal-name">卡片名稱</h3>
+        <p><strong>卡號:</strong> <span id="modal-number"></span></p>
+        <p><strong>稀有度:</strong> <span id="modal-rarity"></span></p>
+        <p><strong>顏色:</strong> <span id="modal-color"></span></p>
+        <p><strong>產生:</strong> <span id="modal-generation"></span></p>
+        <p><strong>價格:</strong> <span id="modal-price"></span></p>
+        <hr>
+        <p><strong>必要エナジー:</strong> <span id="modal-energy"></span></p>
+        <p><strong>AP:</strong> <span id="modal-ap"></span></p>
+        <p><strong>BP:</strong> <span id="modal-bp"></span></p>
+        <p><strong>カード種類:</strong> <span id="modal-type"></span></p>
+        <p><strong>効果:</strong> <span id="modal-effect"></span></p>
+        <p><strong>トリガー:</strong> <span id="modal-trigger"></span></p>
+      </div>
+    </div>
+  </div>
+  <script src="/scripts/html2canvas.min.js"></script>
+  <script src="/scripts/deck-details.js"></script>
+</body>
+</html>

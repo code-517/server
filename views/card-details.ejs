@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <style>
+  body {
+      background-color: #1a1a1a;
+      color: #fff;
+      transition: background-color 0.3s, color 0.3s;
+  }
+  body.dark-mode {
+    background-color: #1a1a1a;
+    color: #fff;
+  }
+  .mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  .mode-toggle:hover {
+    background-color: #0056b3;
+  }
+    h1 {
+      color: #333;
+      margin: 20px 0;
+    }
+
+    .menu-buttons {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .menu-button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background: #0056b3;
+    }
+    
+    /* 側邊選單 */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -450px; /* 初始位置在視窗外 */
+      width: 450px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      transition: left 0.3s ease; /* 添加滑動動畫 */
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 999;
+    }
+    
+    .side-menu.open {
+      left: 0; /* 滑動進入視窗 */
+    }
+    
+    /* 主內容 */
+    .main-content {
+      transition: transform 0.3s ease; /* 添加滑動動畫 */
+    }
+    
+    .main-content.shifted {
+      transform: translateX(450px); /* 向右移動 300px */
+    }
+    body.dark-mode .side-menu {
+      background: #333; /* 深色背景 */
+      color: #fff; /* 白色文字 */
+    }
+
+    body.dark-mode .side-menu h2,
+    body.dark-mode .side-menu p {
+      color: #fff; /* 白色文字 */
+    }
+
+    body.dark-mode .side-menu button {
+      background: #444; /* 深色按鈕背景 */
+      color: #fff; /* 白色文字 */
+    }
+
+    body.dark-mode .side-menu button:hover {
+      background: #555; /* 更深的背景顏色 */
+    }
+    .deck-container {
+      display: flex;
+      flex-wrap: wrap; /* 允許換行 */
+      gap: 20px; /* 卡片之間的間距 */
+      margin-top: 10px;
+      height: calc(80% - 100px); /* 自動填滿側邊選單的高度，減去標題和按鈕的空間 */
+      overflow-y: auto; /* 如果內容超出容器，允許垂直滾動 */
+      box-sizing: border-box; /* 確保內邊距計算在內 */
+    }
+
+    .deck-card {
+      position: relative;
+      width: 70px; /* 固定卡片寬度 */
+      height: 120px; /* 固定卡片高度 */
+      margin: 5px; /* 卡片之間的間距 */
+    }
+
+    .deck-card img {
+      width: 50px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .deck-card .remove-btn {
+      margin-left: auto;
+      background: #ff5c5c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .close-menu {
+      margin-top: 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    .filter-container {
+      position: fixed; /* 固定在視窗內 */
+      top: 0;
+      left: -300px; /* 初始位置在視窗外 */
+      width: 300px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      transition: left 0.3s ease; /* 添加滑動動畫 */
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 999; /* 確保在其他元素上方 */
+    }
+    .filter-container.open {
+      left: 0; /* 滑動進入視窗 */
+    }
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998; /* 在篩選欄下方 */
+      display: none; /* 預設隱藏 */
+    }
+    #overlay.active {
+      display: block; /* 顯示遮罩 */
+    }
+    
+    .filter-container label {
+      margin-right: 10px;
+      font-size: 16px;
+    }
+    .filter-container select {
+      margin-right: 20px;
+      padding: 5px;
+      font-size: 16px;
+    }
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .filter-buttons button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .filter-buttons button:hover {
+      background: #0056b3;
+    }
+    .filter-buttons button.selected {
+      background: #ffd700; /* 選中後的顏色，金黃色 */
+      color: #333; /* 黑色文字 */
+      border: 2px solid #ffa500; /* 添加橙色邊框以突出顯示 */
+    }
+    body.dark-mode .filter-container {
+      background: #333; /* 深色背景 */
+      color: #fff; /* 白色文字 */
+    }
+    
+    body.dark-mode .filter-buttons button {
+      background: #444; /* 深色按鈕背景 */
+      color: #fff; /* 白色文字 */
+    }
+    
+    body.dark-mode .filter-buttons button:hover {
+      background: #555; /* 更深的背景顏色 */
+    }
+/* 卡片容器 */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  transition: transform 0.3s ease, width 0.3s ease; /* 添加動畫效果 */
+}
+
+/* 卡片 */
+.card {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: calc(25% - 15px); /* 每行五張卡片，減去間距 */
+  max-width: 180px; /* 設置最大寬度 */
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
+.card-container.shifted {
+  width: calc(100% - 400px); /* 減去側邊選單的寬度 */
+}
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .card h2 {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    .card p {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    /* 夜間模式卡片樣式 */
+    body.dark-mode .card {
+      background: #333;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    }
+    body.dark-mode .card:hover {
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    }
+    .modal {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* 背景遮罩 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    z-index: 10000; /* 確保彈出框在最上層 */
+  }
+  .modal-content {
+    display: flex;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    gap: 20px;
+    position: relative; /* 為關閉按鈕提供定位基準 */
+    transition: background-color 0.3s, color 0.3s;
+  }
+  body.dark-mode .modal-content {
+    background: #333; /* 深色背景 */
+    color: #fff; /* 白色文字 */
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3); /* 夜间模式的阴影 */
+  }
+  body.dark-mode .modal-left {
+    background: #444; /* 深色背景 */
+  }
+    body.dark-mode .modal-right {
+    background: #333; /* 深色背景 */
+    color: #fff; /* 白色文字 */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* 夜間模式的陰影 */
+  }
+  .modal-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 10px;
+  }
+    .modal-left img {
+    width: 100%; /* 設定寬度為父容器的 100% */
+    height: auto; /* 等比例縮放 */
+    max-width: 400px; /* 限制最大寬度 */
+    max-height: 100%; /* 限制最大高度 */
+    border-radius: 8px; /* 保持圓角 */
+    object-fit: contain; /* 確保圖片不會變形 */
+  }
+  .modal-right {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .modal-right h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  .modal-right p {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  .modal-right hr {
+    margin: 15px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px; /* 距離彈出框頂部 */
+    right: 10px; /* 距離彈出框右側 */
+    background: #ff5c5c;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 35px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+  }
+  .close-btn:hover {
+    background: #ff3b3b;
+  }
+  body.dark-mode .close-btn {
+  background-color: #ff5c5c; /* 保持紅色背景 */
+  color: #fff; /* 保持白色文字 */
+}
+  .deck-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+  .deck-controls button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .deck-controls button:hover {
+    background: #0056b3;
+  }
+  .deck-card {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 150px;
+  margin: 10px;
+}
+
+.deck-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.deck-card .card-count {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgb(255, 254, 254);
+  color: #0c0c0c;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+  .deck-card .remove-btn {
+    margin-left: auto;
+    background: #ff5c5c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .hidden {
+    display: none;
+  }
+.add-to-deck-btn,
+.remove-from-deck-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 30px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  margin: 5px;
+  transition: background 0.3s ease;
+}
+
+.add-to-deck-btn:hover {
+  background: #0056b3;
+}
+
+.remove-from-deck-btn {
+  background: #ff5c5c;
+}
+
+.remove-from-deck-btn:hover {
+  background: #ff3b3b;
+}
+.card-count-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff5c5c;
+  color: #fff;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  visibility: visible; /* 確保圈圈始終可見 */
+}
+@keyframes scale-up-down {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5); /* 放大到 1.5 倍 */
+  }
+  100% {
+    transform: scale(1); /* 恢復原大小 */
+  }
+}
+
+.card-count-indicator.animate {
+  animation: scale-up-down 0.3s ease-in-out; /* 動畫持續 0.3 秒 */
+}
+
+  </style>
+</head>
+<body class="dark-mode">
+  <div class="main-content" id="main-content">
+    <h1 style="text-align: center; margin-top: 20px; color: #fff;"><%= fileName %> - 卡片詳細資料</h1>
+      <!-- 選單按鈕 -->
+      <div class="menu-buttons">
+        <button class="menu-button" id="toggle-menu-btn">☰ 牌組製作</button>
+        <button class="menu-button" id="toggle-filters-btn">☰ 篩選功能</button>
+        <button class="menu-button" id="toggle-translation-btn">顯示中文</button>
+        <button class="menu-button" id="go-to-series-btn">回到選擇系列</button>
+        <button class="menu-button" id="view-decks-btn">搜尋卡組</button>
+      </div>
+      <div class="card-container" id="card-container">
+        <% cards.forEach((card, index) => { %>
+          <div class="card" 
+               data-index="card-<%= index %>"
+               data-card-number="<%= card.card_number %>"
+               data-rarity="<%= card.rare || '無' %>" 
+              data-color="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %>" 
+               data-energy="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[^0-9]/g, '') || '0' : '0' %>" 
+               data-ap="<%= card.details['AP'] ? card.details['AP'].replace(/[^0-9]/g, '') || '0' : '0' %>">
+            <p><%= card.card_number %></p>
+            <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
+            <h2><%= card.card_name %></h2>
+            <span class="card-count-indicator" id="card-count-<%= index %>">0</span>
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
+              <p>稀有度: <%= card.rare %> || 顏色: <%= card.details["必要エナジー"] ? card.details["必要エナジー"].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %></p>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
+              <p>產生: <%= card.details["発生エナジー"] || '無' %> || 價格: <%= card.money || '無價格資料' %></p>
+            </div>
+            <button class="add-to-deck-btn" data-index="<%= index %>">+</button>
+            <button class="remove-from-deck-btn" data-index="<%= index %>">-</button>
+          </div>
+        <% }) %>
+    </div>
+  </div>
+  <!-- 側邊選單 -->
+    <div class="side-menu" id="side-menu">
+      <button class="close-btn" id="close-menu-btn">×</button>
+      <h2>牌組製作</h2>
+      <p>已選擇 <span id="deck-count">0</span> 張卡片</p>
+      <p id="total-price">總價格: 0 日元</p> <!-- 新增總價格顯示 -->
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <button id="sort-energy-btn" style="padding: 5px 10px; border-radius: 5px; background: #007bff; color: #fff;">依必要能量排序</button>
+        <button id="sort-original-btn" style="padding: 5px 10px; border-radius: 5px; background: #444; color: #fff;">依加入順序</button>
+      </div>
+      <div id="deck-container" class="deck-container">
+        <!-- 動態插入卡片 -->
+      </div>
+      <div class="deck-controls" style="position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px;">
+        <!-- 黃色框：牌組名稱 -->
+        <input id="deck-name-input" type="text" placeholder="輸入牌組名稱(不超過8字)" 
+               style="padding: 5px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; width: 100%;">
+      
+        <!-- 綠色框和按鈕 -->
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <!-- 綠色框：思路分享 -->
+          <textarea id="deck-idea-input" placeholder="輸入思路分享 (可為空)" 
+                    style="padding: 5px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; height: 100px; flex: 1;"></textarea>
+      
+          <!-- 按鈕 -->
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- 創建牌組按鈕 -->
+            <button style="background-color: #007bff; color: #fff; padding: 10px 15px; border-radius: 5px; width: 100px;" id="save-deck-btn">創建牌組</button>
+            
+            <!-- 一鍵刪除按鈕 -->
+            <button style="background-color: #ff5c5c; color: #fff; padding: 10px 15px; border-radius: 5px; width: 100px;" id="clear-deck-btn">一鍵刪除</button>
+            <div id="card-modal" class="modal"></div>
+          </div>
+        </div>
+      </div>
+  <!-- 篩選表單 -->
+  <div id="overlay" class="hidden" ></div> <!-- 遮罩層 -->
+    <div class="filter-container" id="filter-container">
+      <button class="close-btn" id="close-filters-btn">×</button> <!-- 新增關閉按鈕 -->
+      <h3>稀有度</h3>
+      <hr>
+      <div class="filter-buttons" id="rarity-buttons">
+        <button class="filter-btn" data-type="rarity" data-value="C">C</button>
+        <button class="filter-btn" data-type="rarity" data-value="R">R</button>
+        <button class="filter-btn" data-type="rarity" data-value="SR">SR</button>
+        <button class="filter-btn" data-type="rarity" data-value="UR">UR</button>
+        <button class="filter-btn" data-type="rarity" data-value="AP">特殊</button>
+      </div>
+    
+      <h3>顏色</h3>
+      <hr>
+      <div class="filter-buttons" id="color-buttons">
+        <button class="filter-btn" data-type="color" data-value="綠">綠色</button>
+        <button class="filter-btn" data-type="color" data-value="黃">黃色</button>
+        <button class="filter-btn" data-type="color" data-value="紅">紅色</button>
+        <button class="filter-btn" data-type="color" data-value="藍">藍色</button>
+        <button class="filter-btn" data-type="color" data-value="紫">紫色</button>
+        <button class="filter-btn" data-type="color" data-value="">全部</button>
+      </div>
+      <h3>必要エナジー</h3>
+      <hr>
+      <div class="filter-buttons" id="energy-buttons">
+        <% for (let i = 0; i <= 20; i++) { %>
+          <button class="filter-btn" data-type="energy" data-value="<%= i %>"><%= i %></button>
+        <% } %>
+      </div>
+
+      <h3>AP</h3>
+      <hr>
+      <div class="filter-buttons" id="ap-buttons">
+        <% for (let i = 1; i <= 3; i++) { %>
+          <button class="filter-btn" data-type="ap" data-value="<%= i %>"><%= i %></button>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- 回到最上按鈕 -->
+  <button id="back-to-top-btn" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
+    display: none; /* 預設隱藏 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  ">↑</button>
+  <!-- 卡片詳細內容彈出框 -->
+  <div id="card-modal" class="modal"></div>
+    <script id="card-data" type="application/json">
+    <%- JSON.stringify(cards) %>
+    </script>
+  <script src="/scripts/card-details.js"></script>
+</body>
+</html>
