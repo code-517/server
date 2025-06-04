@@ -4,7 +4,7 @@ require('dotenv').config(); // 載入環境變數
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -360,19 +360,21 @@ app.post('/deck/save', async (req, res) => {
     res.status(500).json({ success: false, message: '儲存牌組時發生錯誤' });
   }
 });
+
 app.get('/decks', async (req, res) => {
   const { series, name } = req.query;
 
   try {
-    let query = {};
+    let query = { deckName: { $exists: true, $ne: "" } }; // 只查有 deckName 的
     if (series) {
-      query['cards.series'] = { $regex: series, $options: 'i' }; // 支援模糊查詢
+      query['cards.series'] = { $regex: series, $options: 'i' };
     }
     if (name) {
-      query.deckName = { $regex: name, $options: 'i' }; // 支援模糊查詢
+      query.deckName = { $regex: name, $options: 'i' };
     }
 
     const decks = await Deck.find(query).lean();
+    // ...existing code...
 
     // 提取所有系列名稱
     const seriesList = [...new Set(decks.flatMap(deck => deck.cards.map(card => card.series)))];

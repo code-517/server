@@ -31,6 +31,43 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
       console.error('獲取初始牌組數據時發生錯誤:', error);
     });
+      // 角色名稱搜尋功能
+  const searchInput = document.getElementById('character-search-input');
+  const searchBtn = document.getElementById('character-search-btn');
+  const cardContainer = document.getElementById('card-container');
+
+  function filterByCharacterName() {
+    const keyword = searchInput.value.trim().toLowerCase();
+    const cardDivs = cardContainer.querySelectorAll('.card');
+    cardDivs.forEach(div => {
+      const idx = div.getAttribute('data-index').replace('card-', '');
+      const card = cards[idx];
+      const name = (card.card_name || '').toLowerCase();
+      const trname = (card.trcard_name || '').toLowerCase();
+      const cardType = (card.details?.["カード種類"] || '').toLowerCase();
+      const trCardType = (card.details?.["trカード種類"] || '').toLowerCase();
+  
+      // 如果輸入 ap，搜尋行動點卡
+      if (keyword === 'ap') {
+        if (cardType.includes('アクションポイント') || trCardType.includes('行動卡')) {
+          div.style.display = '';
+        } else {
+          div.style.display = 'none';
+        }
+      } else if (keyword === '' || name.includes(keyword) || trname.includes(keyword)) {
+        div.style.display = '';
+      } else {
+        div.style.display = 'none';
+      }
+    });
+  }
+
+  if (searchBtn && searchInput) {
+    searchBtn.addEventListener('click', filterByCharacterName);
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') filterByCharacterName();
+    });
+  }
 });
   // 綁定按鈕事件
   document.getElementById('toggle-menu-btn').addEventListener('click', toggleMenu);
@@ -272,8 +309,9 @@ function viewDecks() {
 }
 
 function showModal(cardNumber, cardRare) {
-  const card = cards.find(card => 
-    card.card_number === cardNumber && card.rare === cardRare
+  const card = cards.find(card =>
+    card.card_number === cardNumber &&
+    (card.rare === cardRare || card.rare === null || cardRare === null)
   );
 
   if (!card) {
@@ -302,16 +340,18 @@ function showModal(cardNumber, cardRare) {
   const triggerHtml = (trigger || '')
     .replace(/\\n/g, '<br>')
     .replace(/\n/g, '<br>');
+  
   const modalContent = `
     <div class="modal-content">
       <button class="close-btn close-modal-btn">×</button>
       <div class="modal-left">
-        <img src="${card.image_url || ''}" alt="${card.card_name || '無名稱'}">
+        <img id="modal-image" src="${card.image_url || ''}" alt="${card.card_name || '無名稱'}" style="cursor:zoom-in;">
       </div>
       <div class="modal-right">
         <h3>${cardName}</h3>
         <p><strong>卡號:</strong> ${card.card_number || '無資料'}</p>
         <p><strong>稀有度:</strong> ${card.rare || '無資料'}</p>
+        <p><strong>特徵:</strong> ${card.details?.["特徴"] || '無資料'}</p>
         <p><strong>顏色:</strong> ${(card.details?.["必要エナジー"]?.replace(/[0-9]/g, '').replace('青', '藍')) || '無'}</p>
         <p><strong>產生:</strong> ${(card.details?.["発生エナジー"]?.replace('青', '藍')) || '無'}</p>
         <p><strong>價格:</strong> ${card.money || '無價格資料'}</p>
@@ -325,14 +365,50 @@ function showModal(cardNumber, cardRare) {
       </div>
     </div>
   `;
-  console.log('effect:', effect);
-  console.log('effect JSON:', JSON.stringify(effect));
+  
   const modal = document.getElementById('card-modal');
   modal.innerHTML = modalContent;
   modal.style.display = 'flex';
-  const closeModalButton = modal.querySelector('.close-modal-btn'); 
+  const closeModalButton = modal.querySelector('.close-modal-btn');
   if (closeModalButton) {
+    closeModalButton.style.background = '#ff5c5c';
+    closeModalButton.style.color = '#fff';
     closeModalButton.addEventListener('click', closeCardModal);
+  }
+
+  // 新增：點擊圖片放大
+  const modalImage = modal.querySelector('#modal-image');
+  if (modalImage) {
+    modalImage.addEventListener('click', () => {
+      showImageOverlay(modalImage.src, modalImage.alt);
+    });
+  }
+}
+
+// 新增：放大圖片層函數
+function showImageOverlay(src, alt) {
+  let overlay = document.getElementById('image-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'image-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.85)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = 99999;
+    overlay.innerHTML = `<img src="${src}" alt="${alt}" style="max-width:90vw;max-height:90vh;box-shadow:0 0 20px #000;border-radius:10px;cursor:zoom-out;">`;
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+    });
+    document.body.appendChild(overlay);
+  } else {
+    overlay.innerHTML = `<img src="${src}" alt="${alt}" style="max-width:90vw;max-height:90vh;box-shadow:0 0 20px #000;border-radius:10px;cursor:zoom-out;">`;
+    overlay.style.display = 'flex';
   }
 }
 

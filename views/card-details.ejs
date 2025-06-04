@@ -358,8 +358,8 @@
     position: absolute;
     top: 10px; /* 距離彈出框頂部 */
     right: 10px; /* 距離彈出框右側 */
-    background: #ff5c5c;
-    color: #fff;
+    background: #ff5c5c !important;
+    color: #fff !important;
     border: none;
     border-radius: 50%;
     width: 35px;
@@ -577,6 +577,18 @@
   <!-- 篩選表單 -->
   <div id="overlay" class="hidden" ></div> <!-- 遮罩層 -->
     <div class="filter-container" id="filter-container">
+      <div style="margin-top: 40px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+        <input
+          type="text"
+          id="character-search-input"
+          placeholder="輸入角色名稱搜尋"
+          style="width: 140px; padding: 5px; font-size: 15px; border-radius: 5px; border: 1px solid #ccc;"
+        >
+        <button
+          id="character-search-btn"
+          style="padding: 5px 12px; font-size: 15px; border-radius: 5px; margin-left: 0; background: #007bff; color: #fff; border: none;"
+        >搜尋</button>
+      </div>
       <button class="close-btn" id="close-filters-btn">×</button> <!-- 新增關閉按鈕 -->
       <h3>稀有度</h3>
       <hr>
