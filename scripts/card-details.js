@@ -421,7 +421,7 @@ function toggleTranslationMode() {
   translationMode = !translationMode;
   const translationButton = document.getElementById('toggle-translation-btn');
   if (translationButton) {
-    translationButton.textContent = translationMode ? '☰ 顯示日文' : '☰ 顯示中文';
+    translationButton.textContent = translationMode ? '顯示日文' : '顯示中文';
   } else {
     console.warn('Translation button not found.');
   }

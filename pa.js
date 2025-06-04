@@ -218,7 +218,22 @@ app.get('/series', async (req, res) => {
 // 卡片詳細資料頁面
 app.get('/cards/:series', async (req, res) => {
   const { series } = req.params;
+  const anonymousId = req.cookies.anonymousId;
 
+  try {
+    // 找出用戶的臨時牌組
+    const userDeck = await Deck.findOne({ owner: anonymousId, deckName: { $exists: false } });
+    if (userDeck && userDeck.cards.length > 0) {
+      // 取得臨時牌組所有卡片的系列（去重）
+      const deckSeriesSet = new Set(userDeck.cards.map(card => card.series));
+      // 如果臨時牌組裡的系列不是只有一種，或不是這次要進入的系列，就清空
+      if (deckSeriesSet.size !== 1 || !deckSeriesSet.has(series)) {
+        await Deck.deleteOne({ owner: anonymousId, deckName: { $exists: false } });
+      }
+    }
+  } catch (err) {
+    console.error('切換系列時檢查/刪除臨時牌組失敗:', err);
+  }
   try {
 
     // 動態選擇集合
@@ -275,7 +290,7 @@ app.post('/deck/add', async (req, res) => {
         card_number: card.card_number,
         rare: card.rare,
         image_url: card.image_url,
-        card_name: card.card_name,
+        trcard_name: card.trcard_name || card.card_name, // 使用 trcard_name，如果不存在則使用 card_name
         series: card.series,
         details: card.details,
         money: card.money,

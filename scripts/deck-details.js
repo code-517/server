@@ -15,7 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('window.deckData is undefined or invalid!');
     return;
   }
-
+  const fullscreenLayer = document.getElementById('fullscreen-image-layer');
+  if (fullscreenLayer) {
+    fullscreenLayer.onclick = function (e) {
+      // 只在點擊背景時關閉，點擊圖片本身不關閉
+      if (e.target === fullscreenLayer) {
+        fullscreenLayer.style.display = 'none';
+        document.getElementById('fullscreen-image').src = '';
+      }
+    };
+  }
   const { deck, deckName, deckIdea, comments } = window.deckData;
 
   // 依必要能量顏色+數字排序
@@ -188,6 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!card) return;
 
     document.getElementById('modal-image').src = card.image_url || '';
+    const modalImage = document.getElementById('modal-image');
+    modalImage.onclick = function () {
+      const fullscreenLayer = document.getElementById('fullscreen-image-layer');
+      const fullscreenImg = document.getElementById('fullscreen-image');
+      fullscreenImg.src = card.image_url || '';
+      fullscreenLayer.style.display = 'flex';
+    };
     document.getElementById('modal-name').textContent = card.trcard_name || card.card_name || '無名稱';
     document.getElementById('modal-number').textContent = card.card_number || '無資料';
     document.getElementById('modal-rarity').textContent = card.rare || '無資料';
@@ -200,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modal-type').textContent = card.details?.["trカード種類"] || card.details?.["カード種類"] || '無';
     document.getElementById('modal-effect').textContent = card.details?.["tr効果"] || card.details?.["効果"] || '無';
     document.getElementById('modal-trigger').textContent = card.details?.["trトリガー"] || card.details?.["トリガー"] || '無';
-
+    console.log(card.trcard_name, card.card_name, card);
     document.getElementById('card-modal').style.display = 'flex';
   }
 });
