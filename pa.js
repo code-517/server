@@ -26,6 +26,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 const cardSchema = new mongoose.Schema({
   series: String,
   card_name: String,
+  trcard_name: String,
   card_number: String,
   rare: String,
   details: Object,
@@ -290,7 +291,8 @@ app.post('/deck/add', async (req, res) => {
         card_number: card.card_number,
         rare: card.rare,
         image_url: card.image_url,
-        trcard_name: card.trcard_name || card.card_name, // 使用 trcard_name，如果不存在則使用 card_name
+        trcard_name: card.trcard_name || '',
+        card_name: card.card_name || '', // 使用 trcard_name，如果不存在則使用 card_name
         series: card.series,
         details: card.details,
         money: card.money,
