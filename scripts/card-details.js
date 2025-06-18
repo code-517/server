@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const copiedCards = JSON.parse(copiedDeck);
     deck = [...deck, ...copiedCards]; // 合併複製的牌組到當前牌組
     localStorage.removeItem('copiedDeck');
-    console.log(copiedCards); // 調試輸出
 
     // 調用 /deck/add API 將複製的牌組同步到伺服器
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -476,7 +475,6 @@ function addToDeck(index) {
     return;
   }
 
-  console.log('新增卡片到牌組:', card); // 調試輸出
 
   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -491,7 +489,6 @@ function addToDeck(index) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        console.log('伺服器返回的牌組:', data.deck); // 調試輸出
         deck = data.deck; // 更新本地的 deck 陣列
         updateDeckDisplay(); // 再次更新側邊選單顯示
         updateCardCount(index); // 更新卡片數量
@@ -699,7 +696,6 @@ function removeOneFromDeck(cardNumber, cardRare) {
       if (!data.success) {
         alert(`移除失敗：${data.message}`);
       } else {
-        console.log('Updated deck from server:', data.deck);
         deck = data.deck; // 更新本地的 deck 陣列
         updateDeckDisplay();
       }
@@ -744,7 +740,6 @@ function addToDeckFromDeck(cardNumber, cardRare) {
   );
 
   if (card) {
-    console.log('Adding card to deck:', card); // 調試輸出
     deck.push({ ...card, rare: card.rare || '無資料' });
     updateDeckDisplay();
 
