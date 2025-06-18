@@ -93,30 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 綁定 "輸出牌組圖片" 按鈕事件
-  document.getElementById('export-deck-btn').addEventListener('click', () => {
+   document.getElementById('export-deck-btn').addEventListener('click', () => {
     const deckContainer = document.querySelector('.deck-container');
     const backgroundImage = new Image();
     backgroundImage.src = '/images/name.png';
-
+  
     backgroundImage.onload = () => {
       html2canvas(deckContainer, { backgroundColor: null }).then((canvas) => {
         const cardCanvas = document.createElement('canvas');
         const ctx = cardCanvas.getContext('2d');
-        const canvasWidth = Math.max(backgroundImage.width, canvas.width);
-        const canvasHeight = backgroundImage.height + canvas.height + 100;
+  
+        // 根據螢幕尺寸動態設置畫布大小
+        const isMobile = window.innerWidth <= 768; // 判斷是否為手機螢幕
+        const canvasWidth = isMobile ? Math.max(backgroundImage.width, canvas.width) : Math.max(backgroundImage.width, canvas.width);
+        const canvasHeight = isMobile
+          ? backgroundImage.height + canvas.height + 50 // 手機螢幕高度調整
+          : backgroundImage.height + canvas.height + 100;
+  
         cardCanvas.width = canvasWidth;
         cardCanvas.height = canvasHeight;
+  
+        // 填充背景
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, cardCanvas.width, cardCanvas.height);
+  
+        // 繪製背景圖片
         ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height);
-        const textX = backgroundImage.width + 30;
-        const textYStart = 140;
-        const spacing = 140;
+  
+        // 動態調整文字大小和間距
+        const textX = backgroundImage.width + (isMobile ? 15 : 30); // 手機螢幕文字位置調整
+        const textYStart = isMobile ? 70 : 140; // 手機螢幕文字起始位置調整
+        const spacing = isMobile ? 70 : 140; // 手機螢幕文字間距調整
+  
         ctx.fillStyle = 'black';
-        ctx.font = '60px Arial';
+        ctx.font = isMobile ? '30px Arial' : '60px Arial'; // 手機螢幕文字大小調整
         ctx.fillText(`牌組名稱: ${window.deckData.deckName}`, textX, textYStart);
         ctx.fillText(`系列: ${window.deckData.deck[0]?.series || '未知系列'}`, textX, textYStart + spacing);
         ctx.fillText(`總金額: ${window.deckData.totalPrice || 0} 日圓`, textX, textYStart + spacing * 2);
+  
+        // 繪製分隔線
         const lineY = backgroundImage.height + 10;
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
@@ -124,21 +139,24 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(0, lineY);
         ctx.lineTo(canvasWidth, lineY);
         ctx.stroke();
+  
+        // 繪製卡片
         const cardX = 0;
         const cardY = lineY + 10;
         ctx.drawImage(canvas, cardX, cardY, canvas.width, canvas.height);
+  
+        // 下載圖片
         const link = document.createElement('a');
         link.download = 'deck-image.png';
         link.href = cardCanvas.toDataURL('image/png');
         link.click();
       });
     };
-
+  
     backgroundImage.onerror = () => {
       alert('無法加載背景圖片，請檢查圖片路徑是否正確！');
     };
   });
-
   // 渲染卡片函數（含數量）
   function renderDeckCards() {
     const deckContainer = document.querySelector('.deck-container');

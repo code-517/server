@@ -171,6 +171,69 @@
     .back-button:hover {
       background-color: #ff3b3b;
     }
+    /* 小螢幕樣式 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* 調整文字大小 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  h1 {
+    font-size: 18px; /* 調整標題大小 */
+    margin-bottom: 10px; /* 減少間距 */
+  }
+
+  .header-container {
+    flex-direction: column; /* 改為垂直排列 */
+    gap: 10px; /* 減少間距 */
+  }
+
+  .header-container h1,
+  .header-container .total-price {
+    font-size: 16px; /* 調整文字大小 */
+  }
+
+  .deck-container {
+    gap: 10px; /* 減少卡片之間的間距 */
+  }
+
+  .deck-card {
+    width: 150px; /* 縮小卡片寬度 */
+    height: 200px; /* 縮小卡片高度 */
+  }
+
+  .deck-card .card-count {
+    font-size: 16px; /* 調整文字大小 */
+    padding: 8px 12px; /* 減少內邊距 */
+  }
+
+  .modal-content {
+    flex-direction: column; /* 改為垂直排列 */
+    width: 90%; /* 限制寬度 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .modal-left img {
+    max-width: 100%; /* 圖片寬度改為 100% */
+    height: auto; /* 自動調整高度 */
+  }
+
+  .modal-right {
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .close-btn {
+    width: 30px; /* 縮小按鈕寬度 */
+    height: 30px; /* 縮小按鈕高度 */
+    font-size: 16px; /* 調整文字大小 */
+  }
+
+  button,
+  .back-button {
+    font-size: 14px; /* 調整按鈕文字大小 */
+    padding: 8px 15px; /* 減少內邊距 */
+  }
+}
   </style>
 </head>
 <body 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="這是一個專門展示卡牌網站，支援搜尋、翻譯、看價格與組牌功能。">
   <meta name="keywords" content="卡牌, 收藏, TCG, 翻譯, 遊戲, Union Arena">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>歪西牌坊</title>
   <link rel="icon" href="/images/name.png" type="image/png">
   <style>
@@ -115,6 +116,38 @@
       max-width: 150px; /* 根據需要調整圖片大小 */
       height: auto;
     }
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px; /* 調整文字大小 */
+    }
+
+    .container {
+      flex-direction: column; /* 改為垂直排列 */
+      align-items: center; /* 垂直置中 */
+      gap: 20px; /* 增加間距 */
+    }
+
+    .series-card {
+      width: 100%; /* 卡片寬度改為 100% */
+      max-width: 300px; /* 限制最大寬度 */
+      padding: 10px; /* 減少內邊距 */
+    }
+
+    .series-card img {
+      max-width: 100%; /* 圖片寬度改為 100% */
+      height: auto; /* 自動調整高度 */
+    }
+
+    .notice-board {
+      width: 90%; /* 寬度改為頁面寬度的 90% */
+      font-size: 12px; /* 調整文字大小 */
+    }
+
+    .view-decks-button {
+      width: 100%; /* 按鈕寬度改為 100% */
+      font-size: 14px; /* 調整文字大小 */
+    }
+  }
   </style>
 </head>
 <body>

@@ -505,6 +505,133 @@
 .card-count-indicator.animate {
   animation: scale-up-down 0.3s ease-in-out; /* 動畫持續 0.3 秒 */
 }
+/* 小螢幕樣式 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px; /* 調整文字大小 */
+  }
+
+  h1 {
+    font-size: 18px; /* 調整標題大小 */
+    margin: 10px 0; /* 減少間距 */
+    text-align: center; /* 居中標題 */
+  }
+
+  .menu-buttons {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: row; /* 改為水平排列 */
+    flex-wrap: wrap; /* 允許換行 */
+    gap: 5px; /* 減少間距 */
+    z-index: 1000;
+  }
+
+  .menu-button {
+    font-size: 14px; /* 調整按鈕文字大小 */
+    padding: 5px 10px; /* 減少內邊距 */
+    border-radius: 3px; /* 減少圓角 */
+  }
+
+  .side-menu {
+    width: 100%; /* 側邊選單寬度改為 100% */
+    left: -100%; /* 初始位置在視窗外 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .side-menu.open {
+    left: 0; /* 滑動進入視窗 */
+  }
+
+  .deck-container {
+    gap: 10px; /* 減少卡片之間的間距 */
+    padding: 10px; /* 減少內邊距 */
+    height: calc(70% - 50px); /* 調整高度 */
+  }
+
+  .deck-card {
+    width: 50px; /* 縮小卡片寬度 */
+    height: 80px; /* 縮小卡片高度 */
+    margin: 5px; /* 減少卡片間距 */
+  }
+
+  .deck-card img {
+    width: 100%; /* 圖片寬度改為 100% */
+    height: auto; /* 自動調整高度 */
+  }
+
+  .filter-container {
+    width: 100%; /* 篩選欄寬度改為 100% */
+    left: -100%; /* 初始位置在視窗外 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .filter-container.open {
+    left: 0; /* 滑動進入視窗 */
+  }
+
+  .filter-buttons button {
+    font-size: 12px; /* 調整按鈕文字大小 */
+    padding: 5px 10px; /* 減少內邊距 */
+    border-radius: 3px; /* 減少圓角 */
+  }
+
+  .card-container {
+    gap: 10px; /* 減少卡片之間的間距 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .card {
+    width: calc(50% - 10px); /* 每行兩張卡片 */
+    max-width: 120px; /* 限制最大寬度 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .card h2 {
+    font-size: 16px; /* 調整文字大小 */
+    margin: 5px 0; /* 減少間距 */
+  }
+
+  .card p {
+    font-size: 12px; /* 調整文字大小 */
+    margin: 5px 0; /* 減少間距 */
+  }
+
+  .modal-content {
+    flex-direction: column; /* 改為垂直排列 */
+    width: 90%; /* 限制寬度 */
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .modal-left img {
+    max-width: 100%; /* 圖片寬度改為 100% */
+    height: auto; /* 自動調整高度 */
+  }
+
+  .modal-right {
+    padding: 10px; /* 減少內邊距 */
+  }
+
+  .close-btn {
+    width: 30px; /* 縮小按鈕寬度 */
+    height: 30px; /* 縮小按鈕高度 */
+    font-size: 16px; /* 調整文字大小 */
+  }
+
+  .add-to-deck-btn,
+  .remove-from-deck-btn {
+    width: 35px; /* 縮小按鈕寬度 */
+    height: 35px; /* 縮小按鈕高度 */
+    font-size: 20px; /* 調整文字大小 */
+  }
+
+  .card-count-indicator {
+    width: 20px; /* 縮小指示器寬度 */
+    height: 20px; /* 縮小指示器高度 */
+    font-size: 12px; /* 調整文字大小 */
+  }
+}
 
   </style>
 </head>
