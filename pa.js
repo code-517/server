@@ -52,6 +52,7 @@ const deckSchema = new mongoose.Schema({
   ],
   owner: String, // 匿名用戶 ID
   createdAt: { type: Date, default: Date.now },
+  lastAccessed: { type: Date, default: Date.now }, // 新增最後訪問時間
 });
 const Deck = mongoose.model('Deck', deckSchema);
 
@@ -83,9 +84,9 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 /////////////
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 分鐘
-  max: 100, // 每個 IP 最多 100 次請求
-  message: '請求過於頻繁，請稍後再試！',
+  windowMs: 1 * 60 * 1000, // 15 分鐘
+  max: 80, // 每個 IP 最多 100 次請求
+  message: { success: false, message: '請求過於頻繁，請稍後再試！' }, // 返回 JSON 格式的錯誤訊息
 });
 app.use(globalLimiter);
 
@@ -267,38 +268,40 @@ const userDecks = {}; // 用戶牌組存儲
 
 // 新增卡片到牌組
 app.post('/deck/add', async (req, res) => {
-  const { card } = req.body;
+  const { cards, card } = req.body; // 接收多張卡片或單張卡片
   const anonymousId = req.cookies.anonymousId;
 
-  if (!card || !card.card_number || !card.image_url) {
-    return res.status(400).json({ success: false, message: '卡片資料不完整' });
+  if ((!cards || !Array.isArray(cards)) && !card) {
+    return res.status(400).json({ success: false, message: '卡片資料無效' });
   }
 
   try {
-    // 只找臨時牌組
     let userDeck = await Deck.findOne({ owner: anonymousId, deckName: { $exists: false } });
 
     if (!userDeck) {
       userDeck = new Deck({ owner: anonymousId, cards: [] });
     }
 
-    // 檢查卡片是否已存在於牌組中
-    const existingCard = userDeck.cards.find(c => c.card_number === card.card_number && c.rare === card.rare);
-    if (existingCard) {
-      existingCard.number += 1; // 如果已存在，增加數量
-    } else {
-      userDeck.cards.push({
-        card_number: card.card_number,
-        rare: card.rare,
-        image_url: card.image_url,
-        trcard_name: card.trcard_name || '',
-        card_name: card.card_name || '', // 使用 trcard_name，如果不存在則使用 card_name
-        series: card.series,
-        details: card.details,
-        money: card.money,
-        number: 1,
-      });
-    }
+    // 處理多張卡片或單張卡片
+    const cardsToAdd = Array.isArray(cards) ? cards : card ? [card] : [];
+
+    cardsToAdd.forEach(cardItem => {
+      const existingCard = userDeck.cards.find(c => c.card_number === cardItem.card_number && c.rare === cardItem.rare);
+      if (existingCard) {
+        existingCard.number += cardItem.number || 1; // 如果已存在，增加數量
+      } else {
+        userDeck.cards.push({
+          card_number: cardItem.card_number,
+          rare: cardItem.rare,
+          image_url: cardItem.image_url || '/images/default-card.png',
+          card_name: cardItem.card_name || '無名稱',
+          series: cardItem.series || '未知系列',
+          details: cardItem.details || {},
+          money: cardItem.money || '0 円',
+          number: cardItem.number || 1,
+        });
+      }
+    });
 
     await userDeck.save();
     res.json({ success: true, message: '卡片已新增到牌組', deck: userDeck.cards });
@@ -307,25 +310,36 @@ app.post('/deck/add', async (req, res) => {
     res.status(500).json({ success: false, message: '新增卡片失敗' });
   }
 });
-
 // 從牌組移除卡片
 app.post('/deck/remove', async (req, res) => {
   const { card } = req.body;
   const anonymousId = req.cookies.anonymousId;
 
-  if (!card) {
+  if (!card || !card.card_number) {
     return res.status(400).json({ success: false, message: '卡片資料無效' });
   }
 
   try {
-    // 只找臨時牌組
     const userDeck = await Deck.findOne({ owner: anonymousId, deckName: { $exists: false } });
 
     if (!userDeck) {
       return res.status(404).json({ success: false, message: '找不到用戶的牌組' });
     }
 
-    const cardIndex = userDeck.cards.findIndex(c => c.card_number === card.card_number && c.rare === card.rare);
+    let cardIndex;
+
+    // 特殊處理卡片種類為「アクションポイント」或「行動卡」
+    if (card.details && (card.details['カード種類'] === 'アクションポイント' || card.details['カード種類'] === '行動卡')) {
+      cardIndex = userDeck.cards.findIndex(c => 
+        c.card_number === card.card_number // 僅匹配卡號
+      );
+    } else {
+      // 一般卡片移除邏輯
+      cardIndex = userDeck.cards.findIndex(c => 
+        c.card_number === card.card_number && 
+        (c.rare === card.rare || !c.rare || !card.rare) // 放寬稀有度匹配條件
+      );
+    }
 
     if (cardIndex !== -1) {
       userDeck.cards[cardIndex].number -= 1;
@@ -430,10 +444,14 @@ app.get('/decks/:deckName', async (req, res) => {
   const { deckName } = req.params;
 
   try {
-    const deck = await Deck.findOne({ deckName }).lean();
+    const deck = await Deck.findOne({ deckName });
     if (!deck) {
       return res.status(404).send('找不到指定的卡組');
     }
+
+    // 更新最後訪問時間
+    deck.lastAccessed = new Date();
+    await deck.save();
 
     const totalPrice = deck.cards.reduce((sum, card) => {
       const price = card.money ? parseFloat(card.money.replace(/[^0-9.]/g, '')) || 0 : 0;
@@ -472,20 +490,22 @@ app.post('/deck/clear', async (req, res) => {
   }
 });
 setInterval(async () => {
-  const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 一個月前的時間
+  const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 1 個月前的時間
 
   try {
-    // 刪除一個月前的牌組
-    const deletedDecks = await Deck.deleteMany({ createdAt: { $lt: oneMonthAgo } });
+    // 找出 1 個月內沒有被訪問且沒有新的留言的牌組
+    const deletedDecks = await Deck.deleteMany({
+      lastAccessed: { $lt: oneMonthAgo }, // 最後訪問時間超過 1 個月
+      deckName: { $exists: true, $ne: "" }, // 確保是有名稱的牌組
+      $nor: [
+        { deckName: { $in: await Comment.find({ timestamp: { $gte: oneMonthAgo } }).distinct('deckName') } }, // 1 個月內有留言的牌組
+      ],
+    });
     console.log(`刪除了 ${deletedDecks.deletedCount} 個過期的牌組`);
-
-    // 刪除一個月前的留言
-    const deletedComments = await Comment.deleteMany({ timestamp: { $lt: oneMonthAgo } });
-    console.log(`刪除了 ${deletedComments.deletedCount} 條過期的留言`);
   } catch (err) {
     console.error('清理過期資料時發生錯誤:', err);
   }
-}, 24 * 60 * 60 * 1000); // 每天執行一次 // 每 1 分鐘檢查一次
+}, 24 * 60 * 60 * 1000); // 每天執行一次 // 每天執行一次 // 每 1 分鐘檢查一次
 // 分享牌組
 app.post('/share-deck', async (req, res) => {
   const { deckName, cards } = req.body;

@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="這是一個專門展示卡牌網站，支援搜尋、翻譯、看價格與組牌功能。">
+  <meta name="keywords" content="卡牌, 收藏, TCG, 翻譯, 遊戲, Union Arena">
   <meta name="csrf-token" content="<%= csrfToken %>">
+  <title><%= fileName %> | 歪西牌坊</title>
+  <link rel="icon" href="/images/name.png" type="image/png">
   <style>
   body {
       background-color: #1a1a1a;
@@ -113,6 +117,7 @@
       height: calc(80% - 100px); /* 自動填滿側邊選單的高度，減去標題和按鈕的空間 */
       overflow-y: auto; /* 如果內容超出容器，允許垂直滾動 */
       box-sizing: border-box; /* 確保內邊距計算在內 */
+      padding-bottom: 150px; /* 新增這行 */
     }
 
     .deck-card {
@@ -151,8 +156,8 @@
     .filter-container {
       position: fixed; /* 固定在視窗內 */
       top: 0;
-      left: -300px; /* 初始位置在視窗外 */
-      width: 300px;
+      left: -350px; /* 初始位置在視窗外 */
+      width: 350px;
       height: 100%;
       background: #fff;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
@@ -520,8 +525,9 @@
                data-index="card-<%= index %>"
                data-card-number="<%= card.card_number %>"
                data-rarity="<%= card.rare || '無' %>" 
-              data-color="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %>" 
+               data-color="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %>" 
                data-energy="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[^0-9]/g, '') || '0' : '0' %>" 
+               data-type="<%= card.details['trカード種類'] || '' %>"
                data-ap="<%= card.details['AP'] ? card.details['AP'].replace(/[^0-9]/g, '') || '0' : '0' %>">
             <p><%= card.card_number %></p>
             <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
@@ -593,13 +599,19 @@
       <h3>稀有度</h3>
       <hr>
       <div class="filter-buttons" id="rarity-buttons">
+        <button class="filter-btn" data-type="rarity" data-value="U">U</button>
         <button class="filter-btn" data-type="rarity" data-value="C">C</button>
         <button class="filter-btn" data-type="rarity" data-value="R">R</button>
         <button class="filter-btn" data-type="rarity" data-value="SR">SR</button>
-        <button class="filter-btn" data-type="rarity" data-value="UR">UR</button>
         <button class="filter-btn" data-type="rarity" data-value="AP">特殊</button>
       </div>
-    
+      <h3>卡的種類</h3>
+      <hr>
+      <div class="filter-buttons" id="type-buttons">
+        <button class="filter-btn" data-type="type" data-value="角色">角色</button>
+        <button class="filter-btn" data-type="type" data-value="事件">事件</button>
+        <button class="filter-btn" data-type="type" data-value="場地">場地</button>
+      </div>
       <h3>顏色</h3>
       <hr>
       <div class="filter-buttons" id="color-buttons">
@@ -610,10 +622,10 @@
         <button class="filter-btn" data-type="color" data-value="紫">紫色</button>
         <button class="filter-btn" data-type="color" data-value="">全部</button>
       </div>
-      <h3>必要エナジー</h3>
+      <h3>必要能量</h3>
       <hr>
       <div class="filter-buttons" id="energy-buttons">
-        <% for (let i = 0; i <= 20; i++) { %>
+        <% for (let i = 0; i <=17 ; i++) { %>
           <button class="filter-btn" data-type="energy" data-value="<%= i %>"><%= i %></button>
         <% } %>
       </div>

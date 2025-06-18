@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="這是一個專門展示卡牌網站，支援搜尋、翻譯、看價格與組牌功能。">
+  <meta name="keywords" content="卡牌, 收藏, TCG, 翻譯, 遊戲, Union Arena">
   <meta name="csrf-token" content="<%= csrfToken %>">
-  <title><%= deckName %> - 卡組詳細內容</title>
+  <title><%= deckName %> |歪西牌坊</title>
+  <link rel="icon" href="/images/name.png" type="image/png">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -212,6 +215,7 @@
   </div>
   <div class="deck-container"></div>
   <button class="back-button" id="go-back-btn">返回</button>
+  <button id="copy-deck-btn" class="nav-button">抄牌</button>
   <button id="export-deck-btn">輸出牌組圖片</button>
   <div id="card-modal" class="modal">
     <div class="modal-content">

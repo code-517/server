@@ -9,28 +9,44 @@ const filters = {
   color: new Set(),
   energy: new Set(),
   ap: new Set(),
+  type: new Set(),
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('/deck/current')
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        deck = data.deck || []; // 初始化 deck 陣列
-        deck.forEach(card => {
-          const index = cards.findIndex(c => c.card_number === card.card_number && c.rare === card.rare);
-          if (index !== -1) {
-            updateCardCount(index); // 初始化數量顯示
-          }
-        });
-        updateDeckDisplay(); // 更新顯示
-      } else {
-        console.error('無法獲取初始牌組數據:', data.message);
-      }
+  const copiedDeck = localStorage.getItem('copiedDeck');
+  if (copiedDeck) {
+    const copiedCards = JSON.parse(copiedDeck);
+    deck = [...deck, ...copiedCards]; // 合併複製的牌組到當前牌組
+    localStorage.removeItem('copiedDeck');
+    console.log(copiedCards); // 調試輸出
+
+    // 調用 /deck/add API 將複製的牌組同步到伺服器
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    fetch('/deck/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify({ cards: copiedCards }), // 傳送複製的牌組
     })
-    .catch(error => {
-      console.error('獲取初始牌組數據時發生錯誤:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('伺服器返回的牌組:', data.deck);
+          deck = data.deck; // 更新本地的 deck 陣列
+          updateDeckDisplay(); // 更新顯示
+        } else {
+          console.error(`新增失敗：${data.message}`);
+        }
+      })
+      .catch(error => {
+        console.error('新增複製牌組時發生錯誤:', error);
+      });
+
+    updateDeckDisplay(); // 更新顯示
+  }
+    
       // 角色名稱搜尋功能
   const searchInput = document.getElementById('character-search-input');
   const searchBtn = document.getElementById('character-search-btn');
@@ -225,13 +241,14 @@ function applyFilters() {
 
   cards.forEach(card => {
     const cardRarity = card.getAttribute('data-rarity');
+    const cardType = card.getAttribute('data-type') || '';
     let cardColor = card.getAttribute('data-color');
     const cardEnergy = card.getAttribute('data-energy');
     const cardAP = parseInt(card.getAttribute('data-ap'), 10);
     const cardNumber = card.getAttribute('data-card-number') || ''; // 確保 cardNumber 不為 null
 
     cardColor = cardColor.replace(/^(綠-|黃-|紅-|藍-)/, '').replace(/[0-9]/g, '').replace(/\+/g, '');
-
+    const matchesType = filters.type.size === 0 || filters.type.has("") || filters.type.has(cardType);
     const matchesRarity = filters.rarity.size === 0 || filters.rarity.has("") || Array.from(filters.rarity).some(rarity => {
       if (rarity === "AP") {
         return cardNumber.includes("AP"); // 檢查 cardNumber 是否包含 "AP"
@@ -241,7 +258,7 @@ function applyFilters() {
     const matchesColor = filters.color.size === 0 || filters.color.has("") || filters.color.has(cardColor || '無');
     const matchesEnergy = filters.energy.size === 0 || filters.energy.has("") || (cardEnergy !== 'null' && filters.energy.has(cardEnergy));    
     const matchesAP = filters.ap.size === 0 || filters.ap.has("") || filters.ap.has(cardAP.toString());
-    if (matchesRarity && matchesColor && matchesEnergy && matchesAP) {
+    if (matchesRarity && matchesColor && matchesEnergy && matchesAP && matchesType) {
       card.style.display = 'block';
     } else {
       card.style.display = 'none';
@@ -454,21 +471,12 @@ function toggleTranslationMode() {
 function addToDeck(index) {
   const card = cards[index];
   if (!card) {
+    console.error('找不到卡片資料，索引:', index);
     alert('找不到卡片資料');
     return;
   }
 
   console.log('新增卡片到牌組:', card); // 調試輸出
-
-  const existingCard = deck.find(item => item.card_number === card.card_number && item.rare === card.rare);
-  if (existingCard) {
-    existingCard.number += 1; // 如果卡片已存在，增加數量
-  } else {
-    deck.push({ ...card, number: 1 }); // 如果卡片不存在，新增到牌組並設置數量為 1
-  }
-
-  updateCardCount(index); // 更新卡片數量顯示
-  updateDeckDisplay(); // 更新側邊選單顯示
 
   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -486,6 +494,7 @@ function addToDeck(index) {
         console.log('伺服器返回的牌組:', data.deck); // 調試輸出
         deck = data.deck; // 更新本地的 deck 陣列
         updateDeckDisplay(); // 再次更新側邊選單顯示
+        updateCardCount(index); // 更新卡片數量
       } else {
         alert(`新增失敗：${data.message}`);
       }
