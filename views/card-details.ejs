@@ -71,6 +71,8 @@
       left: -450px; /* 初始位置在視窗外 */
       width: 450px;
       height: 100%;
+      max-width: 450px; /* 限制最大寬度 */
+      max-height: 100vh; /* 限制最大高度 */
       background: #fff;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
       transition: left 0.3s ease; /* 添加滑動動畫 */
@@ -113,6 +115,7 @@
       display: flex;
       flex-wrap: wrap; /* 允許換行 */
       gap: 20px; /* 卡片之間的間距 */
+      max-height: 400px; /* 限制最大高度 */
       margin-top: 10px;
       height: calc(80% - 100px); /* 自動填滿側邊選單的高度，減去標題和按鈕的空間 */
       overflow-y: auto; /* 如果內容超出容器，允許垂直滾動 */
@@ -361,19 +364,20 @@
   }
   .close-btn {
     position: absolute;
-    top: 10px; /* 距離彈出框頂部 */
-    right: 10px; /* 距離彈出框右側 */
-    background: #ff5c5c !important;
-    color: #fff !important;
+    top: 10px;
+    right: 10px;
+    background: #ff5c5c;
+    color: #fff;
     border: none;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 35px; /* 確保寬度和高度相等 */
+    height: 35px; /* 確保寬度和高度相等 */
+    display: flex; /* 使用 flexbox */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    font-size: 20px; /* 調整文字大小 */
     cursor: pointer;
-    font-size: 20px;
-    line-height: 35px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     transition: background 0.3s ease;
   }
   .close-btn:hover {
@@ -536,23 +540,40 @@
 
   .side-menu {
     width: 100%; /* 側邊選單寬度改為 100% */
+    max-width: 360px; /* 限制最大寬度 */
     left: -100%; /* 初始位置在視窗外 */
     padding: 10px; /* 減少內邊距 */
+    max-height: 100vh; /* 限制最大高度為視窗高度 */
   }
 
   .side-menu.open {
     left: 0; /* 滑動進入視窗 */
   }
-
+  .deck-controls {
+      position: fixed; /* 改為固定定位 */
+      bottom: 10px; /* 調整底部位置 */
+      left: -10px; /* 確保輸入框在可視範圍內 */
+      width: calc(100% - 20px); /* 適配小螢幕，減去左右邊距 */
+      max-width: 100%; /* 限制最大寬度 */
+      padding: 10px; /* 添加內邊距 */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
+  }
+  #deck-name-input,
+  #deck-idea-input {
+      width: 100%; /* 確保寬度填滿父容器 */
+      box-sizing: border-box; /* 包括內邊距和邊框 */
+  }
   .deck-container {
-    gap: 10px; /* 減少卡片之間的間距 */
+    max-height: 400px; /* 限制最大高度 */
+    max-width: 100%; /* 限制最大寬度 */
+    gap: 30px; /* 減少卡片之間的間距 */
     padding: 10px; /* 減少內邊距 */
-    height: calc(70% - 50px); /* 調整高度 */
+    height: calc(70% - 30px); /* 調整高度 */
   }
 
   .deck-card {
     width: 50px; /* 縮小卡片寬度 */
-    height: 80px; /* 縮小卡片高度 */
+    height: 70px; /* 縮小卡片高度 */
     margin: 5px; /* 減少卡片間距 */
   }
 
@@ -598,11 +619,21 @@
     margin: 5px 0; /* 減少間距 */
   }
 
-  .modal-content {
-    flex-direction: column; /* 改為垂直排列 */
-    width: 90%; /* 限制寬度 */
-    padding: 10px; /* 減少內邊距 */
-  }
+.modal-content {
+  display: flex;
+  flex-direction: column; /* 改為垂直排列 */
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80%; /* 限制最大高度，避免超出螢幕 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  gap: 20px;
+  position: relative; /* 為關閉按鈕提供定位基準 */
+  overflow-y: auto; /* 添加垂直滾動功能 */
+  transition: background-color 0.3s, color 0.3s;
+}
 
   .modal-left img {
     max-width: 100%; /* 圖片寬度改為 100% */
@@ -614,9 +645,22 @@
   }
 
   .close-btn {
-    width: 30px; /* 縮小按鈕寬度 */
-    height: 30px; /* 縮小按鈕高度 */
-    font-size: 16px; /* 調整文字大小 */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff5c5c;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 35px; /* 確保寬度和高度相等 */
+    height: 35px; /* 確保寬度和高度相等 */
+    display: flex; /* 使用 flexbox */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    font-size: 20px; /* 調整文字大小 */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    transition: background 0.3s ease;
   }
 
   .add-to-deck-btn,
@@ -630,6 +674,9 @@
     width: 20px; /* 縮小指示器寬度 */
     height: 20px; /* 縮小指示器高度 */
     font-size: 12px; /* 調整文字大小 */
+  }
+    .hidden {
+    display: none;
   }
 }
 
@@ -685,7 +732,7 @@
       <div id="deck-container" class="deck-container">
         <!-- 動態插入卡片 -->
       </div>
-      <div class="deck-controls" style="position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px;">
+      <div class="deck-controls" style="position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px;">
         <!-- 黃色框：牌組名稱 -->
         <input id="deck-name-input" type="text" placeholder="輸入牌組名稱(不超過8字)" 
                style="padding: 5px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; width: 100%;">
@@ -710,7 +757,7 @@
   <!-- 篩選表單 -->
   <div id="overlay" class="hidden" ></div> <!-- 遮罩層 -->
     <div class="filter-container" id="filter-container">
-      <div style="margin-top: 40px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+      <div style="margin-top: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
         <input
           type="text"
           id="character-search-input"

@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          console.log('伺服器返回的牌組:', data.deck);
           deck = data.deck; // 更新本地的 deck 陣列
           updateDeckDisplay(); // 更新顯示
         } else {
@@ -44,6 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
     updateDeckDisplay(); // 更新顯示
+  } else {
+    // 新增：從伺服器獲取臨時牌組
+    fetch('/deck/current', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          deck = data.deck; // 更新本地的 deck 陣列
+          updateDeckDisplay(); // 更新顯示
+        } else {
+          console.error(`獲取臨時牌組失敗：${data.message}`);
+        }
+      })
+      .catch(error => {
+        console.error('獲取臨時牌組時發生錯誤:', error);
+      });
   }
     
       // 角色名稱搜尋功能
@@ -324,6 +343,37 @@ function viewDecks() {
   window.location.href = '/decks';
 }
 
+function highlightKeywords(effectText) {
+  // 定義關鍵字及其顏色
+  const keywordStyles = {
+    "啟動": "color: rgb(112, 209, 253);",
+    "攻擊時": "color: rgb(112, 209, 253);",
+    "阻擋時": "color: rgb(112, 209, 253);",
+    "登場時": "color:rgb(112, 209, 253);",
+    "退場時": "color:rgb(112, 209, 253);",
+    "如果在你的回合中": "color:rgb(112, 209, 253);",
+    "如果在對手的回合中": "color:rgb(112, 209, 253);",
+    "衝擊無效": "color:rgb(235, 245, 94);",
+    "衝擊失效": "color:rgb(235, 245, 94);",
+    "衝擊": "color:rgb(235, 245, 94);",
+    "滑步": "color:rgb(235, 245, 94);",
+    "狙擊": "color:rgb(235, 245, 94);",
+    "阻擋": "color:rgb(235, 245, 94);",
+    "兩次阻擋": "color:rgb(235, 245, 94);",
+    "兩次攻擊": "color:rgb(235, 245, 94);",
+    "傷害": "color:rgb(235, 245, 94);",
+    "突襲": "color:rgb(253, 161, 153);"
+  };
+
+  // 使用正則表達式替換關鍵字
+  const highlightedText = effectText.replace(
+    new RegExp(Object.keys(keywordStyles).join('|'), 'g'),
+    (matched) => `<span style="${keywordStyles[matched]}">${matched}</span>`
+  );
+
+  return highlightedText;
+}
+
 function showModal(cardNumber, cardRare) {
   const card = cards.find(card =>
     card.card_number === cardNumber &&
@@ -350,13 +400,15 @@ function showModal(cardNumber, cardRare) {
   const cardType = translationMode
     ? card.details?.["trカード種類"] || card.details?.["カード種類"] || '無'
     : card.details?.["カード種類"] || '無';
-  const effectHtml = (effect || '')
+  // 確保 effect 和 trigger 存在，否則使用空字串
+  const effectHtml = highlightKeywords(effect || '')
     .replace(/\\n/g, '<br>')
     .replace(/\n/g, '<br>');
-  const triggerHtml = (trigger || '')
+
+  const triggerHtml = highlightKeywords(trigger || '')
     .replace(/\\n/g, '<br>')
     .replace(/\n/g, '<br>');
-  
+
   const modalContent = `
     <div class="modal-content">
       <button class="close-btn close-modal-btn">×</button>
@@ -509,7 +561,7 @@ function updateDeckDisplay() {
   if (deck.length === 0) {
     deckContainer.innerHTML = '<p>牌組為空</p>';
     deckCount.textContent = '0';
-    totalPriceElement.textContent = '總價格: 0 元';
+    totalPriceElement.textContent = '總價格: 0 日元';
     return;
   }
   deckContainer.innerHTML = '';
@@ -581,7 +633,7 @@ function updateDeckDisplay() {
     });
 
     deckCount.textContent = totalCardCount;
-    totalPriceElement.textContent = `總價格: ${Math.round(totalPrice)} 元`;
+    totalPriceElement.textContent = `總價格: ${Math.round(totalPrice)} 日元`;
   } else {
     // 不排序，直接依加入順序顯示
     let totalPrice = 0;
@@ -611,7 +663,7 @@ function updateDeckDisplay() {
       totalCardCount += card.number;
     });
     deckCount.textContent = totalCardCount;
-    totalPriceElement.textContent = `總價格: ${Math.round(totalPrice)} 元`;
+    totalPriceElement.textContent = `總價格: ${Math.round(totalPrice)} 日元`;
   }
 }
 // 美化按鈕的輔助函數

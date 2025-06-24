@@ -208,9 +208,18 @@
   }
 
   .modal-content {
+    display: flex;
     flex-direction: column; /* 改為垂直排列 */
-    width: 90%; /* 限制寬度 */
-    padding: 10px; /* 減少內邊距 */
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 0;
+    width: 95%;
+    max-width: 1000px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    gap: 0;
+    position: relative;
+    overflow-y: auto; /* 添加垂直滾動功能 */
+    max-height: 80%; /* 限制最大高度，避免超出螢幕 */
   }
 
   .modal-left img {
