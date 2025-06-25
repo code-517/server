@@ -59,21 +59,24 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('未找到 data-deck 屬性！');
         return;
       }
-
+  
       const deck = JSON.parse(deckData);
-
+  
       // 確保 deck.cards 存在且有內容
       if (!deck || !deck.length || !deck[0]?.series) {
         console.error('牌組資料無效或沒有卡片！');
         return;
       }
-
-      // 獲取第一張卡片的 series
-      const seriesName = encodeURIComponent(deck[0].series);
+  
+      // 獲取第一張卡片的 series，並將空格替換為 "_"
+    const seriesName = encodeURIComponent(
+      deck[0].series.replace(/\s+/g, '_') // 替換空格
+                    .replace(/[・：×]/g, '_') // 替換特殊字符
+    );
 
       // 存入 localStorage
       localStorage.setItem('copiedDeck', JSON.stringify(deck));
-
+  
       // 跳轉到該系列卡片頁
       window.location.href = `/cards/${seriesName}?copied=1`;
     });
