@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const seriesName = encodeURIComponent(
       deck[0].series.replace(/\s+/g, '_') // 替換空格
                     .replace(/[・：×]/g, '_') // 替換特殊字符
+                    .replace(/の/g, '的') // 替換日文「の」為中文「的」
     );
 
       // 存入 localStorage
