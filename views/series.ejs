@@ -6,149 +6,9 @@
   <meta name="description" content="這是一個專門展示卡牌網站，支援搜尋、UA中文卡表、看價格與組牌功能。">
   <meta name="keywords" content="卡牌, 收藏, TCG, UA中文卡表, 遊戲, Union Arena">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>歪西牌坊</title>
+  <title>歪西牌坊-UA中文卡表</title>
   <link rel="icon" href="/images/name.png" type="image/png">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #1a1a1a;
-      color: #fff;
-    }
-    .container {
-      display: flex; /* 使用 Flexbox 排列 */
-      align-items: center; /* 垂直置中 */
-      justify-content: space-between; 
-      gap: 10px; /* 元素之間的間距 */
-      padding: 20px; /* 整體內邊距 */
-    }
-    .top-left-image img{
-      max-width: 300px;
-      height: auto;
-      border-radius: 10px;
-      margin: 0; /* 確保沒有外邊距 */
-      padding: 0; /* 確保沒有內邊距 */
-    }
-    .top-right-image img {
-      max-width: 150px;
-      height: auto;
-      border-radius: 10px;
-    }
-    .notice-board {
-      width: 80%; /* 寬度為頁面寬度的 80% */
-      max-width: 400px; /* 最大寬度 */
-      background-color: #444; /* 背景顏色 */
-      color: #fff; /* 字體顏色 */
-      border-radius: 8px; /* 圓角 */
-      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 陰影效果 */
-      padding: 15px; /* 內邊距 */
-      font-size: 14px; /* 字體大小 */
-      line-height: 1.5; /* 行高 */
-      text-align: center; /* 文字置中 */
-    }
-    .notice-board h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
-    .series-select-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .series-select {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .series-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-    }
-    .series-card {
-      background: #333;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
-      width: 300px;
-      padding: 15px;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-    }
-    .series-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
-    }
-    .series-card img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    .series-card h2 {
-      font-size: 20px;
-      margin: 10px 0;
-    }
-    .view-decks-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .view-decks-button:hover {
-      background-color: #0056b3;
-    }
-    .logo-container {
-      display: flex; /* 圖片水平排列 */
-      align-items: center; /* 垂直置中 */
-      gap: 10px; /* 圖片之間的間距 */
-    }
-    
-    .server-name img {
-      max-width: 150px; /* 根據需要調整圖片大小 */
-      height: auto;
-    }
-  @media (max-width: 768px) {
-    body {
-      font-size: 14px; /* 調整文字大小 */
-    }
-
-    .container {
-      flex-direction: column; /* 改為垂直排列 */
-      align-items: center; /* 垂直置中 */
-      gap: 20px; /* 增加間距 */
-    }
-
-    .series-card {
-      width: 100%; /* 卡片寬度改為 100% */
-      max-width: 300px; /* 限制最大寬度 */
-      padding: 10px; /* 減少內邊距 */
-    }
-
-    .series-card img {
-      max-width: 100%; /* 圖片寬度改為 100% */
-      height: auto; /* 自動調整高度 */
-    }
-
-    .notice-board {
-      width: 90%; /* 寬度改為頁面寬度的 90% */
-      font-size: 12px; /* 調整文字大小 */
-    }
-
-    .view-decks-button {
-      width: 100%; /* 按鈕寬度改為 100% */
-      font-size: 14px; /* 調整文字大小 */
-    }
-  }
-  </style>
+  <link rel="stylesheet" href="/styles/series.css"> <!-- 引用外部 CSS -->
 </head>
 <body>
   <!-- 查看牌組按鈕 -->
@@ -176,7 +36,7 @@
     <div class="notice-board">
       <h3>📜📜佈告欄📜📜</h3>
       <p>聯絡信箱: blockpn007@gmail.com</p>
-      <p>價格來自悠悠亭，最近更新時間為:7月3號</p>
+      <p>價格來自悠悠亭，最近更新時間為:7月5號</p>
       <p>歡迎使用此系統，幫助你更好體驗union arena</p>
       <p>注意：牌組將在一個月內無人瀏覽時自動刪除。</p>
       <p>注意：牌組製作的牌如果進入不同系列會自動清除。</p>
@@ -193,7 +53,7 @@
   <div class="series-container">
     <% seriesData.forEach(series => { %>
       <div class="series-card" data-series-name="<%= series.name %>">
-        <img src="<%= series.image %>" alt="<%= series.name %>">
+        <img class="lazy" data-src="<%= series.image %>" alt="<%= series.name %>">
         <h2><%= series.name %></h2>
       </div>
     <% }) %>

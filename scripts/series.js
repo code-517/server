@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = `/cards/${selectedSeries}`;
     }
   });
-
+  const lazyImages = document.querySelectorAll('img.lazy');
+  lazyImages.forEach(img => {
+    img.src = img.dataset.src;
+  });
   // 綁定系列卡片點擊事件
   document.querySelectorAll('.series-card').forEach(card => {
     card.addEventListener('click', () => {

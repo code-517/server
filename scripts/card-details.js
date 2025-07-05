@@ -266,7 +266,9 @@ function applyFilters() {
     const cardNumber = card.getAttribute('data-card-number') || ''; // 確保 cardNumber 不為 null
 
     cardColor = cardColor.replace(/^(綠-|黃-|紅-|藍-)/, '').replace(/[0-9]/g, '').replace(/\+/g, '');
-    const matchesType = filters.type.size === 0 || filters.type.has("") || filters.type.has(cardType);
+    const matchesType = filters.type.size === 0 || filters.type.has("") || filters.type.has(cardType) || 
+      (filters.type.has("預組") && cardNumber.includes("ST")) || 
+      (filters.type.has("補充包") && cardNumber.includes("BT"));
     const matchesRarity = filters.rarity.size === 0 || filters.rarity.has("") || Array.from(filters.rarity).some(rarity => {
       if (rarity === "AP") {
         return cardNumber.includes("AP"); // 檢查 cardNumber 是否包含 "AP"
@@ -658,8 +660,14 @@ function updateDeckDisplay() {
       `;
       const addButton = cardElement.querySelector('.add-btn');
       const removeButton = cardElement.querySelector('.remove-btn');
-      addButton.addEventListener('click', () => addToDeckFromDeck(card.card_number, card.rare));
-      removeButton.addEventListener('click', () => removeOneFromDeck(card.card_number, card.rare));
+      addButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        addToDeckFromDeck(card.card_number, card.rare);
+      });     
+      removeButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        removeOneFromDeck(card.card_number, card.rare);
+      });     
       styleButton(addButton, 'add');
       styleButton(removeButton, 'remove');
       deckContainer.appendChild(cardElement);
@@ -789,7 +797,6 @@ function closeCardModal() {
 }
 
 function addToDeckFromDeck(cardNumber, cardRare) {
-  // 確保 rare 有默認值
   const normalizedRare = cardRare === null || cardRare === 'null' ? '無資料' : cardRare;
 
   const card = cards.find(card => 
@@ -798,8 +805,21 @@ function addToDeckFromDeck(cardNumber, cardRare) {
   );
 
   if (card) {
-    deck.push({ ...card, rare: card.rare || '無資料' });
+    const existingCard = deck.find(item => item.card_number === card.card_number && item.rare === card.rare);
+    if (existingCard) {
+      existingCard.number += 1; // 增加數量
+    } else {
+      deck.push({ ...card, rare: card.rare || '無資料', number: 1 }); // 初始化數量為 1
+    }
     updateDeckDisplay();
+
+    // 更新卡片數量顯示
+    const index = cards.findIndex(c => c.card_number === card.card_number && (c.rare || '無資料') === (card.rare || '無資料'));
+    if (index !== -1) {
+      updateCardCount(index); // 更新卡片數量顯示
+    } else {
+      console.warn('找不到對應的卡片資料，無法更新卡片數量顯示');
+    }
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -807,7 +827,7 @@ function addToDeckFromDeck(cardNumber, cardRare) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'CSRF-Token': csrfToken, // 傳遞 CSRF token
+        'CSRF-Token': csrfToken,
       },
       body: JSON.stringify({ card }),
     })
