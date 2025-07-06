@@ -81,7 +81,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/scripts', express.static(path.join(__dirname, 'scripts')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
 /////////////
 const globalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 15 分鐘
@@ -190,7 +189,6 @@ app.get('/', (req, res) => {
 
 app.get('/series', async (req, res) => {
   try {
-    // 等待連線完成
     if (!mongoose.connection.readyState || !mongoose.connection.db) {
       return res.status(503).send('資料庫尚未連線完成，請稍後再試');
     }
@@ -199,18 +197,21 @@ app.get('/series', async (req, res) => {
       .map(col => col.name)
       .filter(name => name !== 'comments' && name !== 'decks');
 
-    const seriesData = [];
-    for (const collectionName of collectionNames) {
+    // 並行查詢每個系列的代表卡
+    const seriesData = await Promise.all(collectionNames.map(async (collectionName) => {
       const DynamicCard = mongoose.connection.db.collection(collectionName);
       const card = await DynamicCard.findOne({}, { projection: { image_url: 1 } });
       if (card) {
-        seriesData.push({
+        return {
           name: collectionName,
           image: card.image_url || '/default-image.jpg',
-        });
+        };
       }
-    }
-    res.render('series', { seriesData });
+      return null;
+    }));
+
+    // 過濾掉 null
+    res.render('series', { seriesData: seriesData.filter(Boolean) });
   } catch (err) {
     console.error('查詢系列時發生錯誤:', err);
     res.status(500).send('伺服器錯誤');

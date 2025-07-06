@@ -53,7 +53,7 @@
   <div class="series-container">
     <% seriesData.forEach(series => { %>
       <div class="series-card" data-series-name="<%= series.name %>">
-        <img class="lazy" data-src="<%= series.image %>" alt="<%= series.name %>">
+        <img loading="lazy" src="<%= series.image %>" alt="<%= series.name %>">
         <h2><%= series.name %></h2>
       </div>
     <% }) %>
