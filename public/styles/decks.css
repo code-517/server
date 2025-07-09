@@ -152,16 +152,18 @@ padding: 8px 10px; /* 減少內邊距 */
 
 .deck-list {
 gap: 10px; /* 減少卡片之間的間距 */
+display: flex;
+flex-wrap: wrap;
 }
 
 .deck-item {
-flex: 0 1 calc(50% - 10px); /* 每行兩張卡片 */
+flex: 0 1 calc(33% - 10px); /* 每行兩張卡片 */
 font-size: 12px; /* 調整文字大小 */
 padding: 8px; /* 減少內邊距 */
 }
 
 .deck-item img {
-height: 150px; /* 縮小圖片高度 */
+height: 120px; /* 縮小圖片高度 */
 }
 
 .deck-name {
@@ -172,15 +174,21 @@ margin: 5px 0; /* 減少間距 */
 .top-right-image img {
 max-width: 100px; /* 縮小圖片寬度 */
 }
-
 .navigation-buttons {
-flex-direction: column; /* 改為垂直排列 */
-gap: 10px; /* 增加間距 */
+flex-direction: row;
+gap: 6px;
+justify-content: center;
+align-items: center;
 }
 
 .nav-button {
-font-size: 14px; /* 調整文字大小 */
-padding: 8px 10px; /* 減少內邊距 */
-border-radius: 15px; /* 減少圓角 */
+font-size: 12px;
+padding: 4px 8px;         /* 內邊距再縮小 */
+border-radius: 8px;       /* 圓角再小一點 */
+min-width: unset;         /* 取消最小寬度限制 */
+flex: unset;              /* 不自動撐開 */
+white-space: nowrap;      /* 不換行 */
+width: auto;              /* 寬度自適應內容 */
+box-sizing: border-box;
 }
 }
