@@ -197,10 +197,35 @@ app.get('/series', async (req, res) => {
       .map(col => col.name)
       .filter(name => name !== 'comments' && name !== 'decks');
 
-    // 並行查詢每個系列的代表卡
+    const energyPattern = /赤[\/／]青[\/／]黄[\/／]緑[\/／]紫/;
+
     const seriesData = await Promise.all(collectionNames.map(async (collectionName) => {
       const DynamicCard = mongoose.connection.db.collection(collectionName);
-      const card = await DynamicCard.findOne({}, { projection: { image_url: 1 } });
+
+      // 先找 PR 且必要エナジー包含五色
+      let card = await DynamicCard.findOne({
+        rare: 'PR',
+        'details.必要エナジー': { $regex: energyPattern }
+      }, { projection: { image_url: 1 } });
+
+      // 如果沒找到，找第一張 SR★★★
+      if (!card) {
+        card = await DynamicCard.findOne({
+          rare: 'SR★★★'
+        }, { projection: { image_url: 1 } });
+      }
+      
+      // 如果還是沒找到，找第一張 SR★★
+      if (!card) {
+        card = await DynamicCard.findOne({
+          rare: 'SR★★'
+        }, { projection: { image_url: 1 } });
+      }
+      
+      // 如果還是沒找到，找第一張卡
+      if (!card) {
+        card = await DynamicCard.findOne({}, { projection: { image_url: 1 } });
+      }
       if (card) {
         return {
           name: collectionName,
@@ -210,7 +235,6 @@ app.get('/series', async (req, res) => {
       return null;
     }));
 
-    // 過濾掉 null
     res.render('series', { seriesData: seriesData.filter(Boolean) });
   } catch (err) {
     console.error('查詢系列時發生錯誤:', err);

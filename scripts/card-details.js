@@ -102,6 +102,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter') filterByCharacterName();
     });
   }
+  document.querySelectorAll('.color-text').forEach(span => {
+    const color = span.getAttribute('data-color');
+    switch (color) {
+      case '黃':
+        span.style.color = '#FFD600';
+        break;
+      case '藍':
+        span.style.color = '#2196F3';
+        break;
+      case '紅':
+        span.style.color = '#F44336';
+        break;
+      case '綠':
+        span.style.color = '#3ec444ff';
+        break;
+      case '紫':
+        span.style.color = '#9C27B0';
+        break;
+      default:
+        span.style.color = '';
+    }
+  });
 });
   // 綁定按鈕事件
   document.getElementById('toggle-menu-btn').addEventListener('click', toggleMenu);

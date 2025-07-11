@@ -21,30 +21,78 @@
         <button class="menu-button" id="go-to-series-btn">回到選擇系列</button>
         <button class="menu-button" id="view-decks-btn">搜尋卡組</button>
       </div>
-      <div class="card-container" id="card-container">
-        <% cards.forEach((card, index) => { %>
-          <div class="card" 
-               data-index="card-<%= index %>"
-               data-card-number="<%= card.card_number %>"
-               data-rarity="<%= card.rare || '無' %>" 
-               data-color="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %>" 
-               data-energy="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[^0-9]/g, '') || '0' : '0' %>" 
-               data-type="<%= card.details['trカード種類'] || '' %>"
-               data-ap="<%= card.details['AP'] ? card.details['AP'].replace(/[^0-9]/g, '') || '0' : '0' %>">
-            <p><%= card.card_number %></p>
-            <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
-            <h2><%= card.card_name %></h2>
-            <span class="card-count-indicator" id="card-count-<%= index %>">0</span>
-            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
-              <p>稀有度: <%= card.rare %> || 顏色: <%= card.details["必要エナジー"] ? card.details["必要エナジー"].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %></p>
+        <div class="card-container" id="card-container">
+          <%
+            // 取得顏色本體
+            function getColorBase(str) {
+              return str && str.match(/[藍紅黃綠紫]/) ? str.match(/[藍紅黃綠紫]/)[0] : str;
+            }
+          %>
+          <% cards.forEach((card, index) => { %>
+            <div class="card" 
+                data-index="card-<%= index %>"
+                data-card-number="<%= card.card_number %>"
+                data-rarity="<%= card.rare || '無' %>" 
+                data-color="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[0-9]/g, '').replace('青', '藍').replace('赤', '紅').replace('緑', '綠').replace('黄', '黃').replace(/[-]/g, '') : '無' %>" 
+                data-energy="<%= card.details['必要エナジー'] ? card.details['必要エナジー'].replace(/[^0-9]/g, '') || '0' : '0' %>" 
+                data-type="<%= card.details['trカード種類'] || '' %>"
+                data-ap="<%= card.details['AP'] ? card.details['AP'].replace(/[^0-9]/g, '') || '0' : '0' %>">
+              <p><%= card.card_number %></p>
+              <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
+              <h2><%= card.card_name %></h2>
+              <span class="card-count-indicator" id="card-count-<%= index %>">0</span>
+              <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
+                <p>
+                  稀有度: <%= card.rare %> || 顏色: 
+                  <%
+                    let colorStrRaw = card.details["必要エナジー"] 
+                      ? card.details["必要エナジー"]
+                          .replace(/[0-9]/g, '')
+                          .replace('青', '藍')
+                          .replace('赤', '紅')
+                          .replace('緑', '綠')
+                          .replace('黄', '黃')
+                          .replace(/[-]/g, '')
+                      : '無';
+                    let colorArrRaw = colorStrRaw.split(/[／\/]/).filter(c => c && c !== '無');
+                  %>
+                  <% if (colorArrRaw.length > 0) { %>
+                    <% colorArrRaw.forEach(function(c, idx) { %>
+                      <span class="color-text" data-color="<%= getColorBase(c) %>"><%= c %></span><%= idx < colorArrRaw.length-1 ? '／' : '' %>
+                    <% }) %>
+                  <% } else { %>
+                    無
+                  <% } %>
+                </p>
+              </div>
+              <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
+                <p>
+                  產生: 
+                  <%
+                    let genStrRaw = card.details["発生エナジー"] 
+                      ? card.details["発生エナジー"]
+                          .replace('青', '藍')
+                          .replace('赤', '紅')
+                          .replace('緑', '綠')
+                          .replace('黄', '黃')
+                          .replace(/[-]/g, '')
+                      : '無';
+                    let genArrRaw = genStrRaw.split(/[／\/]/).filter(c => c && c !== '無');
+                  %>
+                  <% if (genArrRaw.length > 0) { %>
+                    <% genArrRaw.forEach(function(c, idx) { %>
+                      <span class="color-text" data-color="<%= getColorBase(c) %>"><%= c %></span><%= idx < genArrRaw.length-1 ? '／' : '' %>
+                    <% }) %>
+                  <% } else { %>
+                    無
+                  <% } %>
+                  || 價格: <%= card.money || '無價格資料' %>
+                </p>
+              </div>
+              <button class="add-to-deck-btn" data-index="<%= index %>">+</button>
+              <button class="remove-from-deck-btn" data-index="<%= index %>">-</button>
             </div>
-            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-bottom: 10px;">
-              <p>產生: <%= card.details["発生エナジー"] || '無' %> || 價格: <%= card.money || '無價格資料' %></p>
-            </div>
-            <button class="add-to-deck-btn" data-index="<%= index %>">+</button>
-            <button class="remove-from-deck-btn" data-index="<%= index %>">-</button>
-          </div>
-        <% }) %>
+          <% }) %>
     </div>
   </div>
   <!-- 側邊選單 -->
