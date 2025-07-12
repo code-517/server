@@ -53,10 +53,11 @@
       right: 10px;
       background-color: rgba(0, 0, 0, 0.7);
       color: #fff;
-      font-size: 28px; /* 調整字體大小 */
+      font-size: 40px;      /* 字體更大 */
       font-weight: bold;
-      padding: 12px 20px; /* 調整內邊距 */
-      border-radius: 15px;
+      padding: 18px 28px;   /* 內邊距更大 */
+      border-radius: 18px;
+      z-index: 2;
     }
     .modal {
       display: none;

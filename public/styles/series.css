@@ -107,34 +107,47 @@ body {
     height: auto;
 }
 @media (max-width: 768px) {
-body {
-    font-size: 14px; /* 調整文字大小 */
-}
+  body {
+      font-size: 12px;
+  }
 
-.container {
-    flex-direction: column; /* 改為垂直排列 */
-    align-items: center; /* 垂直置中 */
-    gap: 20px; /* 增加間距 */
-}
+  .container {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+  }
 
-.series-card {
-    width: 100%; /* 卡片寬度改為 100% */
-    max-width: 300px; /* 限制最大寬度 */
-    padding: 10px; /* 減少內邊距 */
-}
+  .series-container {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+  }
 
-.series-card img {
-    max-width: 100%; /* 圖片寬度改為 100% */
-    height: auto; /* 自動調整高度 */
-}
+  .series-card {
+      width: 23%;      /* 一排四個 */
+      max-width: 90px; /* 更小的卡片 */
+      padding: 4px;
+      margin-bottom: 6px;
+      font-size: 10px;
+  }
 
-.notice-board {
-    width: 90%; /* 寬度改為頁面寬度的 90% */
-    font-size: 12px; /* 調整文字大小 */
-}
+  .series-card img {
+      max-width: 100%;
+      height: auto;
+  }
+    .series-card h2 {
+      font-size: 12px;
+      margin: 6px 0;
+  }
 
-.view-decks-button {
-    width: 100%; /* 按鈕寬度改為 100% */
-    font-size: 14px; /* 調整文字大小 */
-}
+  .notice-board {
+      width: 98%;
+      font-size: 10px;
+  }
+
+  .view-decks-button {
+      width: 100%;
+      font-size: 11px;
+  }
+
 }

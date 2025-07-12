@@ -594,18 +594,18 @@
 
   .card {
     width: calc(50% - 10px); /* 每行兩張卡片 */
-    max-width: 120px; /* 限制最大寬度 */
-    padding: 10px; /* 減少內邊距 */
+    max-width: 90px; /* 限制最大寬度 */
+    padding: 6px; /* 減少內邊距 */
   }
 
   .card h2 {
-    font-size: 16px; /* 調整文字大小 */
-    margin: 5px 0; /* 減少間距 */
+    font-size: 13px; /* 調整文字大小 */
+    margin: 4px 0; /* 減少間距 */
   }
 
   .card p {
-    font-size: 12px; /* 調整文字大小 */
-    margin: 5px 0; /* 減少間距 */
+    font-size: 10px; /* 調整文字大小 */
+    margin: 3px 0; /* 減少間距 */
   }
 
 .modal-content {
@@ -654,15 +654,19 @@
 
   .add-to-deck-btn,
   .remove-from-deck-btn {
-    width: 35px; /* 縮小按鈕寬度 */
-    height: 35px; /* 縮小按鈕高度 */
-    font-size: 20px; /* 調整文字大小 */
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    margin: 2px;
+    align-items: center;        /* 垂直置中 */
+    justify-content: center; 
+    line-height: 1;             /* 行高設為 1，避免偏移 */
+    padding: 0;                 /* 無內邊距 */
   }
-
   .card-count-indicator {
-    width: 20px; /* 縮小指示器寬度 */
-    height: 20px; /* 縮小指示器高度 */
-    font-size: 12px; /* 調整文字大小 */
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
   }
     .hidden {
     display: none;
