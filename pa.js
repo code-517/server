@@ -197,45 +197,13 @@ app.get('/series', async (req, res) => {
       .map(col => col.name)
       .filter(name => name !== 'comments' && name !== 'decks');
 
-    const energyPattern = /赤[\/／]青[\/／]黄[\/／]緑[\/／]紫/;
-
-    const seriesData = await Promise.all(collectionNames.map(async (collectionName) => {
-      const DynamicCard = mongoose.connection.db.collection(collectionName);
-
-      // 先找 PR 且必要エナジー包含五色
-      let card = await DynamicCard.findOne({
-        rare: 'PR',
-        'details.必要エナジー': { $regex: energyPattern }
-      }, { projection: { image_url: 1 } });
-
-      // 如果沒找到，找第一張 SR★★★
-      if (!card) {
-        card = await DynamicCard.findOne({
-          rare: 'SR★★★'
-        }, { projection: { image_url: 1 } });
-      }
-      
-      // 如果還是沒找到，找第一張 SR★★
-      if (!card) {
-        card = await DynamicCard.findOne({
-          rare: 'SR★★'
-        }, { projection: { image_url: 1 } });
-      }
-      
-      // 如果還是沒找到，找第一張卡
-      if (!card) {
-        card = await DynamicCard.findOne({}, { projection: { image_url: 1 } });
-      }
-      if (card) {
-        return {
-          name: collectionName,
-          image: card.image_url || '/default-image.jpg',
-        };
-      }
-      return null;
+    // 直接用系列名稱組合封面圖路徑
+    const seriesData = collectionNames.map(name => ({
+      name,
+      image: `/images/series/${name}.png`, // 或 .png
     }));
 
-    res.render('series', { seriesData: seriesData.filter(Boolean) });
+    res.render('series', { seriesData });
   } catch (err) {
     console.error('查詢系列時發生錯誤:', err);
     res.status(500).send('伺服器錯誤');
