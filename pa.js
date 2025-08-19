@@ -182,6 +182,16 @@ async function queryDeck(deckName) {
 app.get('/', (req, res) => {
   res.redirect('/series'); // 直接跳轉到選擇系列的頁面
 });
+const PRIZES = ["今天晚餐錢我出", "50元購物金+寶寶抱抱", "30元飲料金+寶寶親親"];
+
+// Ichiban Kuji 抽獎頁面
+app.get('/bobo', (req, res) => {
+  let remaining = req.query.remaining
+    ? req.query.remaining.split(",")
+    : [...PRIZES];
+  const shuffled = remaining.sort(() => Math.random() - 0.5);
+  res.render("index", { shuffled, remaining: shuffled });
+});
 
 
 
@@ -621,6 +631,7 @@ app.get('/deck/current', async (req, res) => {
     res.status(500).json({ success: false, message: '查詢用戶牌組失敗' });
   }
 });
+
 // 啟動伺服器
 app.listen(PORT, () => {
   console.log(`伺服器正在運行，訪問 http://localhost:${PORT}`);
