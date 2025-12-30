@@ -224,9 +224,9 @@ app.get('/series', async (req, res) => {
         '/images/slider/notice3.jpg'
       ],
       noticeSliderLinks: [
-        "http://localhost:3000/use",
-        'http://localhost:3000/cards/%E7%A5%9E%E6%A8%82%E9%89%A2',
-        'http://localhost:3000/cards/%E6%9D%B1%E4%BA%AC%E5%96%B0%E7%A8%AE'
+        "https://server-r0qo.onrender.com/use",
+        'https://server-r0qo.onrender.com/cards/%E7%A5%9E%E6%A8%82%E9%89%A2',
+        'https://server-r0qo.onrender.com/cards/%E6%9D%B1%E4%BA%AC%E5%96%B0%E7%A8%AE'
       ]
     });
   } catch (err) {
