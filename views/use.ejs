@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>功能說明</title>
+  <link rel="stylesheet" href="/styles/use.css" />
+</head>
+<body>
+  <!-- 右上角固定按鈕：返回 series -->
+  <a class="to-series-button" href="/series" aria-label="返回系列">返回系列</a>
+
+  <main class="use-page">
+    <h1>特殊功能說明</h1>
+
+    <!-- 輪播框 -->
+    <div class="use-slider" id="use-slider">
+      <button class="nav prev" type="button" aria-label="上一張">‹</button>
+      <div class="slides">
+        <% const imgs = (Array.isArray(useImages) && useImages.length)
+             ? useImages
+             : ['/images/slider/notice1.png', '/images/union.png']; %>
+        <% imgs.forEach((src, i) => { %>
+          <div class="slide">
+            <img loading="lazy" src="<%= src %>" alt="使用說明圖片 <%= i + 1 %>" />
+          </div>
+        <% }) %>
+      </div>
+      <button class="nav next" type="button" aria-label="下一張">›</button>
+      <div class="dots" aria-label="輪播指示器"></div>
+    </div>
+  </main>
+
+  <script src="/scripts/use.js"></script>
+</body>
+</html>
+  </main>
+</body>
+</html>

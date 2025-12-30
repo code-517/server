@@ -194,7 +194,11 @@ app.get('/bobo', (req, res) => {
 });
 
 
-
+app.get('/use', (req, res) => {
+  res.render('use', {
+    useImages: ['/images/use/1.jpg', '/images/use/2.jpg',"/images/use/3.jpg","/images/use/4.jpg","/images/use/5.jpg"],
+  });
+});
 // 新增 /series API，返回卡片系列檔案名稱列表
 
 app.get('/series', async (req, res) => {
@@ -212,8 +216,19 @@ app.get('/series', async (req, res) => {
       name,
       image: `/images/series/${name}.png`, // 或 .png
     }));
-
-    res.render('series', { seriesData });
+    res.render('series', {
+      seriesData,
+      noticeSliderImages: [
+        '/images/slider/notice1.jpg',
+        '/images/slider/notice2.jpg',
+        '/images/slider/notice3.jpg'
+      ],
+      noticeSliderLinks: [
+        "http://localhost:3000/use",
+        'http://localhost:3000/cards/%E7%A5%9E%E6%A8%82%E9%89%A2',
+        'http://localhost:3000/cards/%E6%9D%B1%E4%BA%AC%E5%96%B0%E7%A8%AE'
+      ]
+    });
   } catch (err) {
     console.error('查詢系列時發生錯誤:', err);
     res.status(500).send('伺服器錯誤');
