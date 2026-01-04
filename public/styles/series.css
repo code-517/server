@@ -192,6 +192,8 @@ body {
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    flex: 1;
+    max-width: 200px;
 }
 
 .series-container {
@@ -255,15 +257,36 @@ body {
       font-size: 12px;
   }
 
+  h1 {
+      width: 50px;
+      line-height: 1.2;
+      word-break: break-all;
+      text-align: center;
+  }
+
+  .notice-slider {
+      height: 170px;
+  }
+
   .top-slider .slide img {
-      height: 140px;
+      height: 170px;
   }
 
   .notice-slider .slide {
-      height: 140px;
+      height: 170px;
   }
   .notice-slider .img-slide img {
-      height: 140px;
+      height: 170px;
+  }
+
+  .notice-slider .text-slide {
+      height: 170px;
+      padding: 12px;
+      font-size: 12px;
+  }
+
+  .notice-slider .dots {
+      bottom: 8px;
   }
 
   .slider-arrow {
@@ -282,6 +305,7 @@ body {
       flex-direction: column;
       align-items: center;
       gap: 16px;
+      padding: 0 4px;
   }
 
   .series-container {

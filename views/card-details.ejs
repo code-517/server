@@ -6,6 +6,7 @@
   <meta name="description" content="這是一個專門展示卡牌網站，支援搜尋、UA中文卡表、看價格與組牌功能。">
   <meta name="keywords" content="卡牌, 收藏, TCG, UA中文卡表, 遊戲, Union Arena">
   <meta name="csrf-token" content="<%= csrfToken %>">
+  <meta name="series-name" content="<%= fileName %>">
   <title><%= fileName %> | 歪西牌坊</title>
   <link rel="icon" href="/images/name.png" type="image/png">
   <link rel="stylesheet" href="/styles/card-details.css"> <!-- 引用外部 CSS -->
@@ -28,6 +29,7 @@
         <button class="menu-button" id="toggle-menu-btn">☰ 牌組製作</button>
         <button class="menu-button" id="toggle-filters-btn">☰ 篩選功能</button>
         <button class="menu-button" id="toggle-translation-btn">顯示中文</button>
+        <button class="menu-button" id="draw-pack-btn">🎲 抽系列卡包</button>
         <button class="menu-button" id="go-to-series-btn">回到選擇系列</button>
         <button class="menu-button" id="view-decks-btn">搜尋卡組</button>
       </div>

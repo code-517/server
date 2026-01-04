@@ -68,7 +68,21 @@ const Comment = mongoose.model('Comment', commentSchema);
 app.use(express.json()); // 用於解析 JSON 主體
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); // 支持解析 URL 編碼的請求主體
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://googleads.g.doubleclick.net", "https://www.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://www.google.com", "https://www.googletagmanager.com", "https://googleads.g.doubleclick.net"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["https://www.googletagmanager.com"],
+    },
+  },
+}));
 app.use(csrf({ cookie: true }));
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
@@ -185,12 +199,34 @@ app.get('/', (req, res) => {
 const PRIZES = ["今天晚餐錢我出", "50元購物金+寶寶抱抱", "30元飲料金+寶寶親親"];
 
 // Ichiban Kuji 抽獎頁面
-app.get('/bobo', (req, res) => {
-  let remaining = req.query.remaining
-    ? req.query.remaining.split(",")
-    : [...PRIZES];
-  const shuffled = remaining.sort(() => Math.random() - 0.5);
-  res.render("index", { shuffled, remaining: shuffled });
+app.get('/bobo', async (req, res) => {
+  const series = req.query.series || '東京喰種'; // 默认系列
+  
+  try {
+    // 从MongoDB获取该系列的所有卡片
+    const DynamicCard = mongoose.connection.db.collection(series);
+    const cards = await DynamicCard.find({}).toArray();
+    
+    let remaining = req.query.remaining
+      ? req.query.remaining.split(",")
+      : [...PRIZES];
+    const shuffled = remaining.sort(() => Math.random() - 0.5);
+    
+    res.render("index", { 
+      shuffled, 
+      remaining: shuffled,
+      series: series,
+      cards: cards
+    });
+  } catch (err) {
+    console.error('加载卡片数据失败:', err);
+    // 如果加载失败，使用默认数据
+    let remaining = req.query.remaining
+      ? req.query.remaining.split(",")
+      : [...PRIZES];
+    const shuffled = remaining.sort(() => Math.random() - 0.5);
+    res.render("index", { shuffled, remaining: shuffled, series: '', cards: [] });
+  }
 });
 
 
@@ -224,9 +260,9 @@ app.get('/series', async (req, res) => {
         '/images/slider/notice3.jpg'
       ],
       noticeSliderLinks: [
-        "https://server-r0qo.onrender.com/use",
-        'https://server-r0qo.onrender.com/cards/%E7%A5%9E%E6%A8%82%E9%89%A2',
-        'https://server-r0qo.onrender.com/cards/%E6%9D%B1%E4%BA%AC%E5%96%B0%E7%A8%AE'
+        "http://localhost:3000/use",
+        'http://localhost:3000/cards/%E7%A5%9E%E6%A8%82%E9%89%A2',
+        'http://localhost:3000/cards/%E6%9D%B1%E4%BA%AC%E5%96%B0%E7%A8%AE'
       ]
     });
   } catch (err) {

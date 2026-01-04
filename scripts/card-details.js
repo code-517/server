@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('toggle-menu-btn').addEventListener('click', toggleMenu);
   document.getElementById('toggle-filters-btn').addEventListener('click', toggleFilters);
   document.getElementById('toggle-translation-btn').addEventListener('click', toggleTranslationMode);
+  document.getElementById('draw-pack-btn').addEventListener('click', drawCardPack);
   document.getElementById('go-to-series-btn').addEventListener('click', goToSeries);
   document.getElementById('view-decks-btn').addEventListener('click', viewDecks);
   const backToTopBtn = document.getElementById('back-to-top-btn');
@@ -307,6 +308,11 @@ function applyFilters() {
     }
   });
 }
+function drawCardPack() {
+  const seriesName = document.querySelector('meta[name="series-name"]').getAttribute('content');
+  window.location.href = `/bobo?series=${encodeURIComponent(seriesName)}`;
+}
+
 function goToSeries() {
   window.location.href = '/series';
 }
