@@ -1,6 +1,6 @@
 # UNION ARENA 卡牌牌組管理系統（Backend Focus）
 
-## 專案快速導覽（TL;DR）
+## 專案快速導覽
 
 - **專案類型**：全端 Web 應用（以後端為核心）
 - **主要技術**：Node.js / Express / MongoDB / EJS
